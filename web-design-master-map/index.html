@@ -51,6 +51,7 @@ button:focus-visible,.stn:focus-visible,.card:focus-visible{outline:2px solid va
 .panel{border:1px solid var(--rule);background:var(--sheet)}
 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .scroll svg{display:block;min-width:1160px;width:100%;height:auto}
+.scroll svg.crop{min-width:0;max-width:560px;margin:0 auto}
 .stn{cursor:pointer}
 .cols{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0}
 @media (max-width:900px){.cols{grid-template-columns:1fr}}
@@ -343,7 +344,10 @@ function lanePath(x1,y1,x2,y2,laneY){
   return `M${x1} ${y1} C${x1+h*.55} ${y1} ${x1+h*.45} ${laneY} ${x1+h} ${laneY} L${x2-h} ${laneY} C${x2-h*.45} ${laneY} ${x2-h*.55} ${y2} ${x2} ${y2}`;
 }
 function drawTransit(host){
-  const svg=el("svg",{viewBox:"0 0 1680 440",role:"img","aria-label":"Transit map of the web design process"},host);
+  const shown=STEPS.filter(s=>visible(s.id)).map(s=>T[s.id][0]);
+  const crop=view==="agent";
+  const vb=crop?`${Math.min(...shown)-130} 0 ${Math.max(...shown)-Math.min(...shown)+260} 290`:"0 0 1680 440";
+  const svg=el("svg",{viewBox:vb,class:crop?"crop":"",role:"img","aria-label":"Transit map of the web design process"},host);
   const bands=[[0,480],[480,920],[920,1165],[1165,1465],[1465,1680]];
   bands.forEach(([a,b],i)=>{
     if(i%2===1)el("rect",{x:a,y:0,width:b-a,height:440,fill:"var(--band)"},svg);
@@ -352,7 +356,8 @@ function drawTransit(host){
   const lines=el("g",{fill:"none","stroke-linecap":"round","stroke-linejoin":"round"},svg);
   const seg=(ids,d,color,w,dash)=>{if(!ids.every(visible))return;el("path",{d,stroke:color,"stroke-width":w,"stroke-dasharray":dash||"none"},lines)};
   const mainIds=["intro","discovery","quote","presentation","questionnaire","kickoff","sitemap","messaging","wireframes","copy","keypages","signoff","build","check","launch","training"];
-  for(let i=0;i<mainIds.length-1;i++){const a=T[mainIds[i]],b=T[mainIds[i+1]];seg([mainIds[i],mainIds[i+1]],`M${a[0]} ${a[1]} L${b[0]} ${b[1]}`,"var(--ink)",6)}
+  const mainVis=mainIds.filter(visible);
+  for(let i=0;i<mainVis.length-1;i++){const a=T[mainVis[i]],b=T[mainVis[i+1]];seg([mainVis[i],mainVis[i+1]],`M${a[0]} ${a[1]} L${b[0]} ${b[1]}`,"var(--ink)",6)}
   seg(["kickoff","styleguide","keypages"],lanePath(435,MAINY,1000,MAINY,110),"var(--track2)",6);
   seg(["build","cms","check"],lanePath(1240,MAINY,1420,MAINY,300),"var(--ink)",3.5,"7 6");
   seg(["kickoff","brief","sitemap"],lanePath(435,MAINY,560,MAINY,300),"var(--red)",3,"2 6");
