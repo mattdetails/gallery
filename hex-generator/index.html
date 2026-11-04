@@ -1,0 +1,336 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Graphyte Hex Generator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700&family=Inter:wght@400;500&display=swap">
+<style>
+  /* Layout: controls rail on the left, live preview filling the right; stacks on phones. */
+  :root {
+    --bg: #F6EFE4;        /* sand 100 */
+    --panel: #FEFAF4;     /* sand 50 */
+    --fg: #1A1817;        /* neutral 900 */
+    --muted: #745F49;     /* sand 600 */
+    --line: #D6C5AB;      /* sand 300 */
+    --accent: #FF5521;    /* orange 500 */
+    --accent-ink: #FFFFFF;
+    --display: "Manrope", "Inter", system-ui, sans-serif;
+    --body: "Inter", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #120502; --panel: #1A1817; --fg: #F6EFE4; --muted: #B8A182; --line: #3D3126; --accent: #FF5521; --accent-ink: #120502; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #120502; --panel: #1A1817; --fg: #F6EFE4; --muted: #B8A182; --line: #3D3126; --accent: #FF5521; --accent-ink: #120502; color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 14px; line-height: 1.45;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px;
+    box-sizing: border-box;
+  }
+  .app { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 20px; min-height: 100%; max-width: 1400px; margin: 0 auto; }
+  @media (max-width: 760px) { .app { grid-template-columns: 1fr; } }
+  h1 { font-family: var(--display); font-weight: 700; font-size: 20px; margin: 0; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 4px 0 0; }
+  .rail { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  fieldset { border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px 14px; margin: 0; display: grid; gap: 10px; }
+  legend { font-family: var(--display); font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 0 4px; }
+  .row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; }
+  .row label { color: var(--fg); }
+  .row output { font-variant-numeric: tabular-nums; color: var(--muted); min-width: 3.5em; text-align: right; }
+  input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); margin: 0; }
+  .seg { display: flex; gap: 4px; flex-wrap: wrap; }
+  .seg button, .act { font: 500 13px var(--body); border: 1px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 5px; padding: 6px 10px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .seg button:focus-visible, .act:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .swatches { display: flex; gap: 6px; flex-wrap: wrap; }
+  .sw { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); cursor: pointer; padding: 0; }
+  .sw[aria-pressed="true"] { outline: 2px solid var(--fg); outline-offset: 2px; }
+  .colors { display: grid; grid-template-columns: auto auto 1fr; gap: 6px 10px; align-items: center; }
+  .colors input[type=color] { width: 36px; height: 24px; border: 1px solid var(--line); border-radius: 4px; padding: 0; background: none; }
+  .colors input.hex { width: 7.5em; height: 24px; font: inherit; font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; padding: 0 6px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--fg); text-transform: uppercase; }
+  .colors input.hex:invalid { border-color: var(--accent); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .act.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .stage { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; display: grid; place-items: center; padding: 16px; min-height: 420px; min-width: 0; }
+  .stage svg { max-width: 100%; max-height: 78vh; height: auto; display: block; box-shadow: 0 1px 0 var(--line); }
+  .meta { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+  .toast { color: var(--accent); min-height: 1.4em; }
+  textarea { width: 100%; box-sizing: border-box; font: 11px/1.4 ui-monospace, Menlo, monospace; height: 90px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); color: var(--fg); }
+  details summary { cursor: pointer; color: var(--muted); }
+</style>
+
+<div class="app">
+  <aside class="rail">
+    <div>
+      <h1>Graphyte Hex Generator</h1>
+      <p class="sub">A graphite lattice that fades by cell size. Move the sliders, copy the SVG.</p>
+    </div>
+
+    <fieldset>
+      <legend>Canvas</legend>
+      <div class="seg" id="sizeSeg">
+        <button type="button" data-size="800x1204" aria-pressed="true">Phone</button>
+        <button type="button" data-size="896x1200">Portrait</button>
+        <button type="button" data-size="1600x900">Wide</button>
+        <button type="button" data-size="1200x1200">Square</button>
+        <button type="button" data-size="1440x600">Banner</button>
+      </div>
+      <div class="row"><label for="w">Width</label><output id="wOut">800</output><input type="range" id="w" min="400" max="2400" step="4" value="800"></div>
+      <div class="row"><label for="h">Height</label><output id="hOut">1204</output><input type="range" id="h" min="300" max="2400" step="4" value="1204"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Bloom</legend>
+      <div class="seg" id="modeSeg">
+        <button type="button" data-mode="corner" aria-pressed="true">Corner</button>
+        <button type="button" data-mode="edge">Edge</button>
+        <button type="button" data-mode="wave">Wave</button>
+      </div>
+      <div class="seg" id="originSeg">
+        <button type="button" data-origin="br" aria-pressed="true">Bottom right</button>
+        <button type="button" data-origin="bl">Bottom left</button>
+        <button type="button" data-origin="tr">Top right</button>
+        <button type="button" data-origin="tl">Top left</button>
+      </div>
+      <div class="row"><label for="cell">Cell spacing</label><output id="cellOut">33 px</output><input type="range" id="cell" min="16" max="120" step="1" value="33"></div>
+      <div class="row"><label for="gap">Gap between tiles</label><output id="gapOut">9%</output><input type="range" id="gap" min="0" max="40" step="1" value="9"></div>
+      <div class="row"><label for="fs">Fade starts</label><output id="fsOut">0%</output><input type="range" id="fs" min="0" max="80" step="1" value="0"></div>
+      <div class="row"><label for="fe">Fade ends</label><output id="feOut">60%</output><input type="range" id="fe" min="10" max="120" step="1" value="60"></div>
+      <div class="row"><label for="wa">Wave amount</label><output id="waOut">12%</output><input type="range" id="wa" min="0" max="30" step="1" value="12"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Colour</legend>
+      <div class="seg" id="themeSeg">
+        <button type="button" data-theme="light" aria-pressed="true">Light</button>
+        <button type="button" data-theme="dark">Dark</button>
+      </div>
+      <div class="colors">
+        <input type="color" id="cGround" value="#F7F5F3"><input type="text" class="hex" id="hGround" value="#F7F5F3" maxlength="7" spellcheck="false" autocomplete="off" pattern="#?[0-9a-fA-F]{6}" aria-label="Ground hex"><label for="cGround">Ground</label>
+        <input type="color" id="cCell" value="#1A1817"><input type="text" class="hex" id="hCell" value="#1A1817" maxlength="7" spellcheck="false" autocomplete="off" pattern="#?[0-9a-fA-F]{6}" aria-label="Cells hex"><label for="cCell">Cells</label>
+        <input type="color" id="cAccent" value="#FF5521"><input type="text" class="hex" id="hAccent" value="#FF5521" maxlength="7" spellcheck="false" autocomplete="off" pattern="#?[0-9a-fA-F]{6}" aria-label="Accent hex"><label for="cAccent">Accent</label>
+      </div>
+      <div class="row"><label for="ac">Accent reaches</label><output id="acOut">14%</output><input type="range" id="ac" min="0" max="60" step="1" value="14"></div>
+      <div class="swatches" id="swatches" aria-label="Graphyte palette"></div>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" class="act primary" id="dlSvg" hidden>Download SVG</button>
+      <button type="button" class="act" id="dlPng" hidden>Download PNG (2×)</button>
+      <button type="button" class="act" id="copySvg">Copy SVG</button>
+      <button type="button" class="act" id="reset">Reset to Matt's defaults</button>
+    </div>
+    <div class="toast" id="toast" aria-live="polite"></div>
+    <details>
+      <summary>SVG source</summary>
+      <textarea id="src" readonly spellcheck="false"></textarea>
+    </details>
+  </aside>
+
+  <main class="stage" id="stage" aria-label="Preview"></main>
+</div>
+<p class="meta"><span id="metaDims"></span><span id="metaCount"></span></p>
+
+<script>
+(function () {
+  // Graphyte 2026 palette, for the swatch row
+  const PALETTE = [
+    ['Orange 500', '#FF5521'], ['Orange 700', '#A62D17'], ['Orange 300', '#FFA77F'],
+    ['Neutral 950', '#120502'], ['Neutral 900', '#1A1817'], ['Neutral 500', '#777271'],
+    ['Site ground', '#F7F5F3'], ['Site card', '#ECE7E3'], ['Site band', '#DBD3CA'],
+    ['Sand 100', '#F6EFE4'], ['Sand 300', '#D6C5AB'], ['Sand 500', '#937C62']
+  ];
+  const THEMES = {
+    light: { ground: '#F7F5F3', cell: '#1A1817', accent: '#FF5521', ac: 12 },
+    dark:  { ground: '#120502', cell: '#FF5521', accent: '#FF5521', ac: 0 }
+  };
+  // Matt's settings, read back from the SVG he exported on 23 Oct 2026.
+  const DEFAULTS = { w: 800, h: 1204, mode: 'corner', origin: 'br', cell: 33, gap: 0.09, fs: 0, fe: 0.60, wa: 0.12,
+                     ground: '#F7F5F3', cellColor: '#1A1817', accent: '#FF5521', ac: 0.14 };
+  // Light vs dark is judged by how bright the ground is, so any pale ground counts as light.
+  const isLight = hex => { const n = parseInt(hex.slice(1), 16); return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 > 128; };
+  const STORE = 'graphyte-hex-settings';
+  const S = Object.assign({}, DEFAULTS);
+  try { Object.assign(S, JSON.parse(localStorage.getItem(STORE) || '{}')); } catch (e) {}
+  const $ = id => document.getElementById(id);
+  function remember() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} }
+
+  // One place that sets a colour: state, the picker swatch and the hex field all follow.
+  const COLOR = { ground: ['cGround', 'hGround', 'ground'], cell: ['cCell', 'hCell', 'cellColor'], accent: ['cAccent', 'hAccent', 'accent'] };
+  function normHex(v) { const m = String(v).trim().match(/^#?([0-9a-f]{6})$/i); return m ? '#' + m[1].toUpperCase() : null; }
+  function setColor(which, v) {
+    const hex = normHex(v); if (!hex) return false;
+    const [pickerId, textId, key] = COLOR[which];
+    S[key] = hex; $(pickerId).value = hex; $(textId).value = hex; return true;
+  }
+
+  // Push the state into the controls, so a remembered or reset state shows correctly.
+  function syncControls() {
+    const pct = v => Math.round(v * 100);
+    const set = (id, v, label) => { $(id).value = v; $(id + 'Out').textContent = label; };
+    set('w', S.w, S.w); set('h', S.h, S.h); set('cell', S.cell, S.cell + ' px');
+    set('gap', pct(S.gap), pct(S.gap) + '%'); set('fs', pct(S.fs), pct(S.fs) + '%'); set('fe', pct(S.fe), pct(S.fe) + '%');
+    set('wa', pct(S.wa), pct(S.wa) + '%'); set('ac', pct(S.ac), pct(S.ac) + '%');
+    setColor('ground', S.ground); setColor('cell', S.cellColor); setColor('accent', S.accent);
+    const press = (segId, attr, val) => [...$(segId).querySelectorAll('button')].forEach(b => b.setAttribute('aria-pressed', b.dataset[attr] === val));
+    press('sizeSeg', 'size', S.w + 'x' + S.h); press('modeSeg', 'mode', S.mode); press('originSeg', 'origin', S.origin);
+    press('themeSeg', 'theme', isLight(S.ground) ? 'light' : 'dark');
+  }
+
+  function ease(t) { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }
+  function hexPts(cx, cy, r) {
+    const p = [];
+    for (let i = 0; i < 6; i++) { const a = (60 * i - 30) * Math.PI / 180; p.push((cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1)); }
+    return p.join(' ');
+  }
+
+  function build() {
+    const { w, h, mode, origin, cell, gap, fs, fe, wa, ground, cellColor, accent, ac } = S;
+    const diag = Math.hypot(w, h);
+    const rowH = cell * Math.sqrt(3) / 2;
+    const fullR = (cell / 2) * (1 - gap) / Math.cos(Math.PI / 6);
+    const ox = origin[1] === 'r' ? w : 0, oy = origin[0] === 'b' ? h : 0;
+    const dist = (x, y) => {
+      if (mode === 'edge') return (origin[0] === 'b' ? (h - y) : y) / h;
+      let d = Math.hypot(ox - x, oy - y) / diag;
+      if (mode === 'wave') { const along = (Math.abs(ox - x) / w + Math.abs(oy - y) / h) / 2; d += wa * Math.sin(along * Math.PI * 2 * 0.9); }
+      return d;
+    };
+    const polys = [];
+    const rows = Math.ceil(h / rowH) + 3, cols = Math.ceil(w / cell) + 3;
+    for (let j = -1; j < rows; j++) {
+      const cy = h - j * rowH, xo = j % 2 ? cell / 2 : 0;
+      for (let i = -1; i < cols; i++) {
+        const cx = i * cell + xo;
+        const d = dist(cx, cy);
+        const scale = 1 - ease((d - fs) / Math.max(0.001, fe - fs));
+        if (scale < 0.035) continue;
+        const col = (ac > 0 && d < ac) ? accent : cellColor;
+        polys.push('<polygon points="' + hexPts(cx, cy, fullR * scale) + '" fill="' + col + '"/>');
+      }
+    }
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '">\n' +
+      '<rect width="' + w + '" height="' + h + '" fill="' + ground + '"/>\n<g>\n' + polys.join('\n') + '\n</g>\n</svg>';
+    return { svg, count: polys.length };
+  }
+
+  let raf = 0;
+  function render() {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      const { svg, count } = build();
+      $('stage').innerHTML = svg;
+      $('src').value = svg;
+      $('metaDims').textContent = S.w + ' × ' + S.h + ' px · ' + S.mode + ' · ' + S.origin;
+      $('metaCount').textContent = count.toLocaleString() + ' cells · ' + (svg.length / 1024).toFixed(0) + ' KB';
+      remember();
+    });
+  }
+
+  function bindRange(id, key, fmt, scale) {
+    const el = $(id), out = $(id + 'Out');
+    el.addEventListener('input', () => { S[key] = scale ? el.valueAsNumber / 100 : el.valueAsNumber; out.textContent = fmt(el.valueAsNumber); render(); });
+  }
+  bindRange('w', 'w', v => v); bindRange('h', 'h', v => v);
+  bindRange('cell', 'cell', v => v + ' px');
+  bindRange('gap', 'gap', v => v + '%', true);
+  bindRange('fs', 'fs', v => v + '%', true);
+  bindRange('fe', 'fe', v => v + '%', true);
+  bindRange('wa', 'wa', v => v + '%', true);
+  bindRange('ac', 'ac', v => v + '%', true);
+
+  function seg(id, attr, onPick) {
+    const box = $(id);
+    box.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      [...box.querySelectorAll('button')].forEach(x => x.setAttribute('aria-pressed', x === b));
+      onPick(b.dataset[attr]); render();
+    });
+  }
+  seg('sizeSeg', 'size', v => { const [w, h] = v.split('x').map(Number); S.w = w; S.h = h; $('w').value = w; $('h').value = h; $('wOut').textContent = w; $('hOut').textContent = h; });
+  seg('modeSeg', 'mode', v => { S.mode = v; });
+  seg('originSeg', 'origin', v => { S.origin = v; });
+  seg('themeSeg', 'theme', v => {
+    const t = THEMES[v]; setColor('ground', t.ground); setColor('cell', t.cell); setColor('accent', t.accent); S.ac = t.ac / 100;
+    $('ac').value = t.ac; $('acOut').textContent = t.ac + '%';
+  });
+
+  Object.keys(COLOR).forEach(which => {
+    const [pickerId, textId] = COLOR[which];
+    $(pickerId).addEventListener('input', e => { setColor(which, e.target.value); render(); });
+    // Hex field: apply as soon as six valid digits are typed or pasted; on blur or Enter, tidy it up or revert.
+    $(textId).addEventListener('input', e => { if (setColor(which, e.target.value)) render(); });
+    const commit = () => { if (!setColor(which, $(textId).value)) $(textId).value = $(pickerId).value.toUpperCase(); else render(); };
+    $(textId).addEventListener('blur', commit);
+    $(textId).addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); commit(); e.target.blur(); } });
+  });
+
+  // Palette swatches: click sets the cell colour; shift-click sets the ground.
+  const sw = $('swatches');
+  PALETTE.forEach(([name, hex]) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.style.background = hex; b.title = name + ' ' + hex + ' (click: cells, shift-click: ground)';
+    b.addEventListener('click', e => { setColor(e.shiftKey ? 'ground' : 'cell', hex); render(); });
+    sw.appendChild(b);
+  });
+
+  function toast(msg) { $('toast').textContent = msg; setTimeout(() => { if ($('toast').textContent === msg) $('toast').textContent = ''; }, 2500); }
+  function copy(text, ok) {
+    navigator.clipboard.writeText(text).then(() => toast(ok)).catch(() => { $('src').closest('details').open = true; $('src').select(); toast('Clipboard blocked. The source is selected below, press copy.'); });
+  }
+  $('copySvg').addEventListener('click', () => copy($('src').value, 'SVG copied. Paste into a .svg file or straight into Figma.'));
+
+  $('reset').addEventListener('click', () => { Object.assign(S, DEFAULTS); syncControls(); render(); toast('Back to the 800 × 1204 light corner setup.'); });
+
+  function fileStem() {
+    const theme = isLight(S.ground) ? 'light' : 'dark';
+    return 'graphyte-hex-' + theme + '-' + S.mode + '-' + S.origin + '-' + S.w + 'x' + S.h;
+  }
+  function svgToPngBlob(svg, scale) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+      img.onload = () => {
+        const c = document.createElement('canvas'); c.width = S.w * scale; c.height = S.h * scale;
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(b => b ? resolve(b) : reject(new Error('png')), 'image/png');
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('svg')); };
+      img.src = url;
+    });
+  }
+  function explainSave(err) {
+    const code = err && err.code;
+    if (code === 'declined') return 'Save cancelled.';
+    if (code === 'rate_limited') return 'A save prompt is already open. Answer it first.';
+    if (code === 'too_large') return 'That file is too large for this save. Try a smaller canvas.';
+    return 'Saving is not available in this view. Copy SVG still works.';
+  }
+
+  // The downloads capability resolves later than first paint, so the buttons stay hidden until it answers.
+  (async () => {
+    const downloads = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
+    if (!downloads) return;
+    $('dlSvg').hidden = false; $('dlPng').hidden = false;
+    $('dlSvg').addEventListener('click', async () => {
+      try { await downloads.save({ filename: fileStem() + '.svg', data: $('src').value }); toast('SVG saved.'); }
+      catch (e) { toast(explainSave(e)); }
+    });
+    $('dlPng').addEventListener('click', async () => {
+      try {
+        toast('Rendering PNG…');
+        const blob = await svgToPngBlob($('src').value, 2);
+        await downloads.save({ filename: fileStem() + '@2x.png', data: blob });
+        toast('PNG saved at ' + (S.w * 2) + ' × ' + (S.h * 2) + '.');
+      } catch (e) { toast(explainSave(e)); }
+    });
+  })();
+
+  syncControls();
+  render();
+})();
+</script>
+
+</body></html>

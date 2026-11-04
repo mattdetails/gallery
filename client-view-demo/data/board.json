@@ -1,0 +1,86 @@
+{
+  "project": "Example Project",
+  "clientName": "Alex",
+  "boardUrl": "",
+  "syncedAt": "2026-10-08T17:00:00.000Z",
+  "nextSyncAt": "2026-10-09T05:00:00.000Z",
+  "yourTasks": [
+    {
+      "id": "t1",
+      "title": "Send us your logo files",
+      "context": "We need the original files (SVG or AI) for the new site header.",
+      "due": "2026-10-07T22:00:00.000Z",
+      "complete": false
+    },
+    {
+      "id": "t2",
+      "title": "Pick a time for the kickoff call",
+      "context": "Three slots are in the calendar invite.",
+      "due": "2026-10-10T22:00:00.000Z",
+      "complete": false
+    },
+    {
+      "id": "t3",
+      "title": "Share access to your Google Analytics",
+      "context": "Read-only access is enough.",
+      "start": "2026-10-08T14:00:00.000Z",
+      "due": "2026-10-15T22:00:00.000Z",
+      "complete": false
+    },
+    {
+      "id": "t4",
+      "title": "Answer the questions about your customers",
+      "complete": false
+    }
+  ],
+  "needsReview": [
+    {
+      "id": "r1",
+      "title": "Homepage design, first draft",
+      "context": "Two layout options. Tick when you've picked one and left notes.",
+      "due": "2026-10-09T22:00:00.000Z",
+      "complete": false
+    },
+    {
+      "id": "r2",
+      "title": "Wording for the sign-up email",
+      "complete": false
+    }
+  ],
+  "upNext": [
+    {
+      "id": "u1",
+      "title": "A clear first step for new visitors",
+      "kind": "Epic",
+      "context": "Visitors know what to do within ten seconds of landing.",
+      "progress": {
+        "done": 2,
+        "total": 5
+      },
+      "due": "2026-10-24T22:00:00.000Z"
+    },
+    {
+      "id": "u2",
+      "title": "Booking works on phones",
+      "kind": "Epic",
+      "progress": {
+        "done": 0,
+        "total": 3
+      }
+    },
+    {
+      "id": "u3",
+      "title": "Faster page loads",
+      "kind": "Story",
+      "start": "2026-10-13T14:00:00.000Z"
+    }
+  ],
+  "done": [
+    {
+      "id": "d1",
+      "title": "Approve the project plan",
+      "complete": true,
+      "completedAt": "2026-10-06T15:30:00.000Z"
+    }
+  ]
+}

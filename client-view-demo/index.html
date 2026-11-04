@@ -1,0 +1,332 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Client View Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Client view: one column of three buckets, summary strip first. Restyle per client by editing these tokens only. */
+:root{
+  --bg:#f5f6f8; --paper:#ffffff; --ink:#16202c; --ash:#5a6675; --line:#dfe3e9; --slot:#eceff3;
+  --accent:#2747c9; --accent-ink:#ffffff; --accent-soft:#e6ebfb;
+  --late:#b4232b; --late-soft:#fbe9ea; --soon:#8a5a00; --soon-soft:#fbf1dc; --ok:#1d7a4a; --ok-soft:#e3f3ea;
+  --display:"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --body:"Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141b; --paper:#161d27; --ink:#e8edf4; --ash:#9aa6b6; --line:#273241; --slot:#1e2733;
+  --accent:#8ea2ff; --accent-ink:#0f141b; --accent-soft:#1f2848;
+  --late:#ff8a8f; --late-soft:#3a1c20; --soon:#f0c068; --soon-soft:#352a14; --ok:#6fd39d; --ok-soft:#163126;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141b; --paper:#161d27; --ink:#e8edf4; --ash:#9aa6b6; --line:#273241; --slot:#1e2733;
+  --accent:#8ea2ff; --accent-ink:#0f141b; --accent-soft:#1f2848;
+  --late:#ff8a8f; --late-soft:#3a1c20; --soon:#f0c068; --soon-soft:#352a14; --ok:#6fd39d; --ok-soft:#163126;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.55 var(--body);padding-inline:16px;padding-block:0 56px}
+.wrap{max-width:760px;margin:0 auto}
+h1,h2{font-family:var(--display);font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+header{padding-block:clamp(32px,6vw,64px) 24px;display:grid;gap:14px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ash)}
+h1{font-size:clamp(34px,6vw,52px);line-height:1.05}
+.lede{color:var(--ash);max-width:34em}
+.syncbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+.syncbar .when{flex:1 1 220px;min-width:0;font-size:14px;color:var(--ash)}
+.syncbar .when b{color:var(--ink);font-weight:600}
+.notice{font-size:13px;color:var(--ash)}
+
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-block:8px 28px}
+.summary a{display:grid;gap:2px;padding:12px 14px;border-radius:12px;background:var(--slot);text-decoration:none;color:inherit}
+.summary .n{font:600 26px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.summary .l{font-size:13px;color:var(--ash)}
+@media (max-width:460px){.summary{grid-template-columns:1fr}.summary a{grid-template-columns:auto 1fr;align-items:baseline;gap:10px}}
+
+section{display:grid;gap:12px;margin-block:0 36px}
+.sec-head{display:grid;gap:4px}
+h2{font-size:clamp(22px,3.4vw,28px)}
+.sec-head p{color:var(--ash);font-size:14px}
+ul.cards{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+.card.no-tick{grid-template-columns:minmax(0,1fr)}
+.card.is-done .title{text-decoration:line-through;color:var(--ash)}
+.tick{appearance:none;margin:2px 0 0;width:22px;height:22px;border:2px solid var(--ash);border-radius:7px;display:grid;place-items:center;cursor:pointer;background:var(--paper)}
+.tick:checked{background:var(--ok);border-color:var(--ok)}
+.tick:checked::after{content:"";width:6px;height:11px;border:solid var(--paper);border-width:0 2.5px 2.5px 0;transform:translateY(-1px) rotate(45deg)}
+.tick:disabled{cursor:default;opacity:.6}
+.main{display:grid;gap:6px;min-width:0}
+.title{font-weight:600;overflow-wrap:anywhere}
+.title a{color:inherit;text-decoration:none}
+.title a:hover{text-decoration:underline}
+.ctx{font-size:13px;color:var(--ash);overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 12px/1 var(--mono);padding:5px 8px;border-radius:999px;background:var(--slot);color:var(--ash);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chip.late{background:var(--late-soft);color:var(--late)}
+.chip.soon{background:var(--soon-soft);color:var(--soon)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.kind{background:var(--accent-soft);color:var(--accent)}
+.bar{height:6px;border-radius:999px;background:var(--slot);overflow:hidden;max-width:220px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:inherit}
+.empty{padding:16px;border:1px dashed var(--line);border-radius:12px;color:var(--ash);font-size:14px}
+footer{color:var(--ash);font-size:13px;display:grid;gap:4px}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}.card:hover{border-color:var(--ash)}}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow" id="project">Project board</span>
+    <h1 id="hello">Your project at a glance</h1>
+    <p class="lede">What needs you right now, what's waiting for your review, and what we're working on next.</p>
+    <div class="syncbar">
+      <p class="when" id="when">Loading the latest from the board…</p>
+      <p class="notice" id="notice" hidden></p>
+    </div>
+  </header>
+
+  <nav class="summary" aria-label="Summary">
+    <a href="#tasks"><span class="n" id="n-tasks">–</span><span class="l">Your tasks</span></a>
+    <a href="#review"><span class="n" id="n-review">–</span><span class="l">Need your review</span></a>
+    <a href="#next"><span class="n" id="n-next">–</span><span class="l">Up next</span></a>
+  </nav>
+
+  <section id="tasks" aria-labelledby="h-tasks">
+    <div class="sec-head"><h2 id="h-tasks">Your Tasks</h2><p>Things only you can do right now. Tick one off when it's done. It reaches our board at the next sync.</p></div>
+    <ul class="cards" id="list-tasks"></ul>
+  </section>
+
+  <section id="review" aria-labelledby="h-review">
+    <div class="sec-head"><h2 id="h-review">Needs Your Review</h2><p>Work, answers and deliverables waiting for your approval. Tick one when you've reviewed it.</p></div>
+    <ul class="cards" id="list-review"></ul>
+  </section>
+
+  <section id="next" aria-labelledby="h-next">
+    <div class="sec-head"><h2 id="h-next">Up Next</h2><p>What the team is working on in the background.</p></div>
+    <ul class="cards" id="list-next"></ul>
+  </section>
+
+  <section id="done" aria-labelledby="h-done">
+    <div class="sec-head"><h2 id="h-done">Done This Week</h2><p>What you've ticked off in the last seven days. Untick anything you marked by mistake.</p></div>
+    <ul class="cards" id="list-done"></ul>
+  </section>
+
+  <footer>
+    <p id="schedule">This page syncs with our board at 12am and 12pm Central time.</p>
+    <p id="board-link"></p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var DAY = 864e5;
+  var PENDING_KEY = "client-view-pending";
+  var board = null;           // data/board.json, written by the sync
+  var client = { marks: {} };  // data/client.json, written by this page
+  var art = null;             // artifact capability, null when unavailable
+  var readOnly = true;
+  var saveTimer = null;
+
+  // Times arrive with mixed offsets (Z from the page, -05:00 from a sync), so compare them as numbers, never as strings.
+  function t(iso) { return iso ? Date.parse(iso) : 0; }
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  function fmtDate(iso) {
+    var d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  }
+  function fmtStamp(iso) {
+    var d = new Date(iso);
+    return d.toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  }
+
+  // A tick the client made after the last sync overrides what Trello said at that sync.
+  function isDone(card) {
+    var m = client.marks[card.id];
+    if (m && t(m.at) > t(board.syncedAt)) return m.done;
+    return !!card.complete;
+  }
+  function doneAt(card) {
+    var m = client.marks[card.id];
+    return (m && m.done && m.at) || card.completedAt || board.syncedAt;
+  }
+
+  function dateChips(card, chips, done) {
+    if (card.start) chips.appendChild(el("span", "chip", "Starts " + fmtDate(card.start)));
+    if (!card.due) return;
+    var c = el("span", "chip");
+    var days = Math.floor((new Date(card.due) - Date.now()) / DAY);
+    if (done) { c.className = "chip ok"; c.textContent = "Due " + fmtDate(card.due); }
+    else if (days < 0) { c.className = "chip late"; c.textContent = "Overdue \u00b7 " + fmtDate(card.due); }
+    else if (days < 3) { c.className = "chip soon"; c.textContent = "Due " + fmtDate(card.due); }
+    else c.textContent = "Due " + fmtDate(card.due);
+    chips.appendChild(c);
+  }
+
+  function cardItem(card, opts) {
+    var done = opts.tickable ? isDone(card) : false;
+    var li = el("li", "card" + (opts.tickable ? "" : " no-tick") + (done ? " is-done" : ""));
+    if (opts.tickable) {
+      var box = el("input", "tick");
+      box.type = "checkbox"; box.id = "tick-" + card.id; box.checked = done; box.disabled = readOnly;
+      box.setAttribute("aria-label", (done ? "Mark not done: " : "Mark done: ") + card.title);
+      box.addEventListener("change", function () { mark(card.id, box.checked); });
+      li.appendChild(box);
+    }
+    var main = el("div", "main");
+    var t = el("p", "title");
+    if (card.url) { var a = el("a", null, card.title); a.href = card.url; a.target = "_blank"; a.rel = "noopener"; t.appendChild(a); }
+    else t.textContent = card.title;
+    main.appendChild(t);
+    if (card.context) main.appendChild(el("p", "ctx", card.context));
+    if (card.progress && card.progress.total) {
+      var bar = el("div", "bar"); bar.setAttribute("role", "img");
+      bar.setAttribute("aria-label", card.progress.done + " of " + card.progress.total + " done");
+      var fill = el("i"); fill.style.width = Math.round(100 * card.progress.done / card.progress.total) + "%";
+      bar.appendChild(fill); main.appendChild(bar);
+    }
+    var chips = el("div", "chips");
+    if (opts.kind && card.kind) chips.appendChild(el("span", "chip kind", card.kind));
+    if (card.progress && card.progress.total) chips.appendChild(el("span", "chip", card.progress.done + " of " + card.progress.total + " done"));
+    if (opts.doneOn) chips.appendChild(el("span", "chip ok", "Done " + fmtDate(doneAt(card))));
+    else dateChips(card, chips, done);
+    if (chips.childNodes.length) main.appendChild(chips);
+    li.appendChild(main);
+    return li;
+  }
+
+  function fill(listId, cards, opts, emptyText) {
+    var ul = $(listId); ul.textContent = "";
+    if (!cards.length) { ul.appendChild(el("li", "empty", emptyText)); return; }
+    cards.forEach(function (c) { ul.appendChild(cardItem(c, opts)); });
+  }
+
+  function byDue(a, b) {
+    if (a.due && b.due) return t(a.due) - t(b.due);
+    return a.due ? -1 : b.due ? 1 : 0;
+  }
+
+  function render() {
+    if (!board) return;
+    $("project").textContent = board.project || "Project board";
+    document.title = (board.project || "Project") + " Board";
+    $("hello").textContent = board.clientName ? "Hi " + board.clientName + ", here's where things stand" : "Your project at a glance";
+
+    var mine = (board.yourTasks || []).concat(board.needsReview || []);
+    var weekAgo = Date.now() - 7 * DAY;
+    var tasks = (board.yourTasks || []).filter(function (c) { return !isDone(c); }).sort(byDue);
+    var review = (board.needsReview || []).filter(function (c) { return !isDone(c); }).sort(byDue);
+    var seen = {};
+    var done = mine.concat(board.done || []).filter(function (c) {
+      if (seen[c.id]) return false; seen[c.id] = true;
+      return isDone(c) && t(doneAt(c)) >= weekAgo;
+    }).sort(function (a, b) { return t(doneAt(b)) - t(doneAt(a)); });
+    var next = board.upNext || [];
+
+    $("n-tasks").textContent = tasks.length;
+    $("n-review").textContent = review.length;
+    $("n-next").textContent = next.length;
+    fill("list-tasks", tasks, { tickable: true }, "Nothing needs you right now.");
+    fill("list-review", review, { tickable: true }, "Nothing is waiting for your review.");
+    fill("list-next", next, { kind: true }, "Nothing is lined up yet.");
+    fill("list-done", done, { tickable: true, doneOn: true }, "Nothing ticked off in the last seven days.");
+
+    var when = $("when"); when.textContent = "";
+    if (board.syncedAt) {
+      when.appendChild(document.createTextNode("Last synced "));
+      when.appendChild(el("b", null, fmtStamp(board.syncedAt)));
+      when.appendChild(document.createTextNode(". Next sync " + fmtStamp(board.nextSyncAt || board.syncedAt) + "."));
+    } else when.textContent = "Not synced yet.";
+    if (board.boardUrl) {
+      var p = $("board-link"); p.textContent = "Prefer the full board? ";
+      var a = el("a", null, "Open it in Trello"); a.href = board.boardUrl; a.target = "_blank"; a.rel = "noopener";
+      p.appendChild(a);
+    }
+  }
+
+  function showNotice(text) { var n = $("notice"); n.textContent = text; n.hidden = !text; }
+
+  function stash() { try { sessionStorage.setItem(PENDING_KEY, JSON.stringify(client)); } catch (e) {} }
+  function unstash() {
+    try {
+      var s = JSON.parse(sessionStorage.getItem(PENDING_KEY) || "null");
+      sessionStorage.removeItem(PENDING_KEY);
+      return s;
+    } catch (e) { return null; }
+  }
+
+  function mark(id, done) {
+    client.marks[id] = { done: done, at: new Date().toISOString() };
+    render();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(save, 1200);  // a few quick ticks go out as one save
+  }
+
+  function save() {
+    clearTimeout(saveTimer);
+    if (!art || readOnly) return;
+    stash();
+    showNotice("Saving…");
+    art.publish({ "data/client.json": { content: JSON.stringify(client, null, 2), contentType: "application/json" } })
+      .then(function () {
+        try { sessionStorage.removeItem(PENDING_KEY); } catch (e) {}
+        showNotice("Saved. It reaches our board at the next sync.");
+        render();
+      })
+      .catch(function (err) {
+        var code = err && err.code;
+        if (code === "conflict") return;  // the page reloads to the newer version; the stash re-applies this change
+        if (code === "not_writer" || code === "not_granted" || code === "not_declared" || code === "consent_required" || code === "capability_disabled" || code === "capability_removed") {
+          readOnly = true; render();
+          showNotice("This copy is view only, so ticks can't be saved. Ask us for an editing invite.");
+          return;
+        }
+        if (code === "rate_limited") { showNotice("Saving a lot at once. Trying again in a minute."); saveTimer = setTimeout(save, 60000); return; }
+        showNotice("That didn't save. Check your connection and tick it again.");
+      });
+  }
+
+  function load(path) {
+    return fetch(path, { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+  }
+
+  // Demo snapshot: the sample data was written around this moment. Move every date by the same
+  // amount so the board always reads as if it were synced today.
+  var DEMO_WRITTEN = Date.parse("2026-10-08T19:30:00.000Z");
+  function shiftDemoDates() {
+    var shift = Date.now() - DEMO_WRITTEN;
+    function move(o, k) { if (o && o[k]) o[k] = new Date(t(o[k]) + shift).toISOString(); }
+    move(board, "syncedAt"); move(board, "nextSyncAt");
+    ["yourTasks", "needsReview", "upNext", "done"].forEach(function (list) {
+      (board[list] || []).forEach(function (c) { move(c, "start"); move(c, "due"); move(c, "completedAt"); });
+    });
+    Object.keys(client.marks).forEach(function (id) { move(client.marks[id], "at"); });
+  }
+
+  Promise.all([load("data/board.json"), load("data/client.json")]).then(function (res) {
+    board = res[0] || { project: "", yourTasks: [], needsReview: [], upNext: [], done: [] };
+    if (res[1]) client = { marks: res[1].marks || {} };
+    shiftDemoDates();
+    var pending = unstash();
+    if (pending) {
+      Object.keys(pending.marks || {}).forEach(function (id) {
+        var a = pending.marks[id], b = client.marks[id];
+        if (!b || t(a.at) > t(b.at)) client.marks[id] = a;
+      });
+    }
+    render();
+    var cap = window.claude && window.claude.use ? window.claude.use("artifact") : Promise.resolve(null);
+    cap.then(function (a) {
+      art = a; readOnly = !a; render();
+      if (pending) save();
+    });
+  });
+
+})();
+</script>
+
+</body></html>

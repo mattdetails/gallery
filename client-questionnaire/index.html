@@ -1,0 +1,212 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Graphyte Client Questionnaire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: a single calm column, one section per card, labelled "Part 2 of 6", no percentage bar. Built for a phone. */
+:root{
+  --bg:#F3F4F5;--card:#FFFFFF;--ink:#1C2B3A;--soft:#5A6672;--rule:#D9DEE3;--field:#F7F8F9;
+  --accent:#B03A2A;--accent-soft:#F6E3DF;--ok:#2F7A4B;
+  --display:"Fraunces",Georgia,serif;--ui:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11181F;--card:#18222C;--ink:#E7ECF0;--soft:#A3AEB8;--rule:#2C3946;--field:#1F2B36;--accent:#E57A63;--accent-soft:#3A2420;--ok:#7CC496;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11181F;--card:#18222C;--ink:#E7ECF0;--soft:#A3AEB8;--rule:#2C3946;--field:#1F2B36;--accent:#E57A63;--accent-soft:#3A2420;--ok:#7CC496;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.55;margin:0}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:24px 64px;display:flex;flex-direction:column;gap:18px}
+.draft{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--accent);margin:0}
+h1{font-family:var(--display);font-weight:500;font-size:clamp(28px,6vw,36px);line-height:1.15;margin:4px 0 0;text-wrap:balance}
+.intro{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:18px 18px}
+.intro p{margin:0 0 10px}.intro p:last-child{margin:0}
+.saved{font-size:13px;color:var(--soft)}
+section.part{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:20px 18px;display:flex;flex-direction:column;gap:22px}
+.part-head{display:flex;flex-direction:column;gap:2px;border-bottom:1px solid var(--rule);padding-bottom:12px}
+.part-head span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--soft)}
+.part-head h2{font-family:var(--display);font-weight:500;font-size:24px;margin:0}
+.q{display:flex;flex-direction:column;gap:8px;min-width:0}
+.q label.ql,.q .ql{font-weight:600;font-size:16px}
+.req{color:var(--accent);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-left:6px;white-space:nowrap}
+.hint{font-size:14px;color:var(--soft);margin:-4px 0 0}
+input[type=text],input[type=date],textarea{font:inherit;color:inherit;background:var(--field);border:1px solid var(--rule);border-radius:10px;padding:10px 12px;width:100%}
+textarea{min-height:96px;resize:vertical}textarea.big{min-height:150px}
+input:focus-visible,textarea:focus-visible,button:focus-visible,.chip:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);background:var(--field);border-radius:999px;padding:7px 12px;font-size:14px;cursor:pointer;user-select:none}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip.on{border-color:var(--accent);background:var(--accent-soft)}
+.chip .n{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--card);font-size:12px;font-weight:700}
+.pairs{display:grid;gap:8px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pair .chip{justify-content:center}
+.rows{display:grid;gap:10px}
+.row{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));padding:10px;border:1px dashed var(--rule);border-radius:10px}
+.row>*{min-width:0}
+.add{align-self:flex-start;font:inherit;font-size:14px;font-weight:500;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:999px;padding:6px 14px;cursor:pointer}
+.items{display:grid;gap:8px}
+.item{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid var(--rule);border-radius:10px}
+.item .chips{gap:6px}
+.unsure{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--soft);cursor:pointer;align-self:flex-start}
+.unsure input{width:16px;height:16px;accent-color:var(--accent)}
+.submit{display:flex;flex-direction:column;gap:10px}
+.submit button{font:inherit;font-weight:600;font-size:16px;color:var(--card);background:var(--ink);border:0;border-radius:12px;padding:14px 18px;cursor:pointer}
+.agenda{background:var(--card);border:1px solid var(--accent);border-radius:14px;padding:18px}
+.agenda h2{font-family:var(--display);font-weight:500;font-size:22px;margin:0 0 6px}
+.agenda ol{margin:8px 0 0;padding-left:20px;display:grid;gap:6px}
+.agenda .why{color:var(--soft);font-size:14px}
+.err{color:var(--accent);font-size:13px}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="draft">Draft for review · nothing is sent</p>
+    <h1>Before our kickoff call</h1>
+  </header>
+
+  <div class="intro">
+    <p>These questions help us plan your site and use our kickoff call well. Most people take 20 to 30 minutes, and your answers save as you go on this device.</p>
+    <p>Only three questions are required. Rough answers and "not sure" are fine; we'll talk them through on the call. Only our team sees your answers. Questions? Contact Matt.</p>
+    <p class="saved" id="saved" aria-live="polite">Your answers save as you type.</p>
+  </div>
+
+  <form id="form" novalidate></form>
+
+  <section class="agenda" id="agenda" hidden aria-live="polite"></section>
+</div>
+
+<script>
+const PARTS=[
+{t:"Your goals",qs:[
+ {id:"1.1",type:"text",q:"Why are you getting a new website now? What changed?"},
+ {id:"1.2",type:"long",q:"What should a visitor be able to do on the new site that they can't do easily today?"},
+ {id:"1.3",type:"rank",max:3,req:true,q:"Pick up to three goals for the site and put them in order.",hint:"Tap in order of importance. Tap again to remove.",opts:["Get calls","Get enquiries or quote requests","Take bookings","Sell online","Hire staff","Build trust before a sales call","Answer common questions","Show past work","Other"]},
+ {id:"1.4",type:"pick",req:true,q:"What is the one main thing you want a visitor to do?",opts:["Call","Fill in a form","Book","Buy","Visit in person","Other"]},
+ {id:"1.5",type:"text",q:"A year after launch, what would tell you the site is working?",hint:"A number helps if you have one, such as enquiries a month now versus what you'd like."}
+]},
+{t:"Your customers",qs:[
+ {id:"2.1",type:"big",q:"Think of a recent customer who was a great fit. What did they need, and how did they find you?",hint:"No names needed. A few sentences is ideal; the more detail, the better."},
+ {id:"2.2",type:"rows",q:"Does anyone else use your site, such as job seekers, partners or existing customers?",hint:"List them in order of importance.",fields:["Who","What they want to do"]},
+ {id:"2.3",type:"rows",q:"What do people ask you most before they buy?",hint:"List as many as come to mind.",fields:["Question"]},
+ {id:"2.4",type:"rows",q:"What makes people hesitate or not go ahead? How do you usually answer that?",fields:["What worries them","How you answer"]},
+ {id:"2.5",type:"text",q:"If you didn't exist, what would your customers do instead?",hint:"For example, use another business, do it themselves, or do nothing."},
+ {id:"2.6",type:"rows",q:"Why do customers choose you over that?",hint:"Give a real example or a number for each reason if you can.",fields:["Reason","Example or number"]}
+]},
+{t:"What you offer",qs:[
+ {id:"3.1",type:"rows",q:"List your services or products.",hint:"Add who each is for, what customers call it if that's different, a starting price if you show prices, and whether you want to sell more of it.",fields:["Service or product","Who it's for","What customers call it","Starting price","Want to sell more?"]},
+ {id:"3.2",type:"text",q:"Where do you work?",hint:"Towns, regions, or online only."},
+ {id:"3.3",type:"big",q:"Paste or link your best reviews, testimonials or kind customer emails.",hint:"Five to ten is ideal. Mark any we may quote by name with (OK to name)."},
+ {id:"3.4",type:"rows",q:"Which facts can we state with confidence?",hint:"For example, years in business, jobs completed, qualifications, awards, guarantees.",fields:["Fact"]}
+]},
+{t:"Your look and voice",qs:[
+ {id:"4.1",type:"items",q:"What brand material do you already have?",hint:"For each one you have, say whether it must stay or can change.",items:["Logo","Colours","Fonts","Brand guidelines","Photos","Icons"],states:["Must stay","Can change","Don't have"]},
+ {id:"4.2",type:"rank",max:5,q:"Pick three to five words for how the site should feel, and put them in order.",hint:"Tap in order. Then finish the line for your top words below.",opts:["Approachable","Authoritative","Bold","Calm","Caring","Confident","Crafted","Down-to-earth","Energetic","Established","Expert","Friendly","Honest","Playful","Premium","Reliable","Warm","Witty"],follow:"For your top words, finish the line \"…, but not …\". For example, \"friendly, but not casual\"."},
+ {id:"4.3",type:"pairs",q:"For each pair, pick the side that fits you better.",pairs:[["Friendly","Expert"],["Playful","Serious"],["Established","New"],["Everyday","Premium"],["Plain-spoken","Technical"]]},
+ {id:"4.4",type:"rows",q:"Share two or three websites you like.",hint:"They don't have to be in your field. Say what you like: colours, type, photos, layout, wording or overall feel.",fields:["Website link","What you like about it"]},
+ {id:"4.5",type:"rows",q:"Are there sites you dislike, including competitors? What puts you off?",hint:"Tell us how you'd like to look different from your competitors.",fields:["Website link","What puts you off"]},
+ {id:"4.6",type:"pick",q:"Do you have good photos of your team, your work or your premises?",opts:["Yes, plenty","Some","Not really","We'd consider a photo shoot","Stock photos are fine"]},
+ {id:"4.7",type:"big",q:"Paste one to three things you've written that sound like you.",hint:"An email, a social post or a page. Add any words you love or never want to see."}
+]},
+{t:"Your current site and features",qs:[
+ {id:"5.1",type:"long",q:"If you have a site now, what should we keep or carry over?",hint:"For example, pages that work well, web addresses people link to, or forms."},
+ {id:"5.2",type:"check",q:"Which pages do you think you'll need?",hint:"A first guess is fine; we'll shape this together.",opts:["Home","About","Services","Individual service pages","Work or case studies","Reviews","Pricing","Team","Careers","Blog or news","FAQ","Contact","Other"]},
+ {id:"5.3",type:"check",q:"Does the site need to do anything special?",opts:["Bookings","Payments","News or blog","A team, project or location list you update","Newsletter sign-up","More than one language","Links to other systems you use","Other"]},
+ {id:"5.4",type:"rows",q:"Who will check the draft words with us, and who will update the site after launch?",fields:["Checks the words","Updates the site"],single:true}
+]},
+{t:"People and timing",qs:[
+ {id:"6.1",type:"rows",req:true,q:"Who gives final approval on the design and words?",fields:["Name","Role"],single:true},
+ {id:"6.2",type:"rows",q:"Who else should have a say? Should any of them answer the Goals or Customers sections themselves?",fields:["Name","Role","Answer those sections? (yes/no)"]},
+ {id:"6.3",type:"date",q:"Is there a date the site must be live by? What is driving it?"},
+ {id:"6.4",type:"long",q:"Is there anything you'd rather talk through on the call than write down?"}
+]}
+];
+const STAND_IN=/\b(modern|clean|professional|everyone|everybody|quality|sleek|nice|simple)\b/i;
+const KEY="graphyte-questionnaire-draft";
+let data={};try{data=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){data={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data));document.getElementById("saved").textContent="Saved on this device."}catch(e){document.getElementById("saved").textContent="Couldn't save on this device. Your answers stay on this page."}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+const form=document.getElementById("form");
+
+function unsureHTML(q){return `<label class="unsure"><input type="checkbox" data-unsure="${q.id}" ${data[q.id+"_unsure"]?"checked":""}> Not sure, let's discuss on the call</label>`}
+function render(){
+  form.innerHTML="";
+  PARTS.forEach((p,pi)=>{
+    const sec=document.createElement("section");sec.className="part";
+    sec.innerHTML=`<div class="part-head"><span>Part ${pi+1} of ${PARTS.length}</span><h2>${p.t}</h2></div>`;
+    p.qs.forEach(q=>{
+      const d=document.createElement("div");d.className="q";d.dataset.q=q.id;
+      const lab=`<span class="ql" id="l${q.id}">${esc(q.q)}${q.req?'<span class="req">Required</span>':""}</span>${q.hint?`<p class="hint">${esc(q.hint)}</p>`:""}`;
+      let body="";const v=data[q.id];
+      if(q.type==="text")body=`<input type="text" id="f${q.id}" aria-labelledby="l${q.id}" value="${esc(v||"")}">`;
+      else if(q.type==="long"||q.type==="big")body=`<textarea id="f${q.id}" class="${q.type==="big"?"big":""}" aria-labelledby="l${q.id}">${esc(v||"")}</textarea>`;
+      else if(q.type==="date")body=`<input type="date" id="f${q.id}" aria-labelledby="l${q.id}" value="${esc((v||{}).date||"")}"><input type="text" id="f${q.id}b" aria-label="What is driving the date" placeholder="What is driving it?" value="${esc((v||{}).why||"")}">`;
+      else if(q.type==="rank"){const order=v||[];body=`<div class="chips" role="group" aria-labelledby="l${q.id}">${q.opts.map(o=>{const i=order.indexOf(o);return `<button type="button" class="chip${i>=0?" on":""}" data-rank="${q.id}" data-opt="${esc(o)}" aria-pressed="${i>=0}">${i>=0?`<span class="n">${i+1}</span>`:""}${esc(o)}</button>`}).join("")}</div>`;
+        if(q.follow)body+=`<p class="hint">${esc(q.follow)}</p><textarea id="f${q.id}b" aria-label="But not lines">${esc(data[q.id+"b"]||"")}</textarea>`}
+      else if(q.type==="pick")body=`<div class="chips" role="radiogroup" aria-labelledby="l${q.id}">${q.opts.map(o=>`<label class="chip${v===o?" on":""}"><input type="radio" name="r${q.id}" value="${esc(o)}" data-pick="${q.id}" ${v===o?"checked":""}>${esc(o)}</label>`).join("")}</div>`;
+      else if(q.type==="check"){const s=v||[];body=`<div class="chips" role="group" aria-labelledby="l${q.id}">${q.opts.map(o=>`<label class="chip${s.includes(o)?" on":""}"><input type="checkbox" value="${esc(o)}" data-check="${q.id}" ${s.includes(o)?"checked":""}>${esc(o)}</label>`).join("")}</div>`}
+      else if(q.type==="pairs"){const s=v||{};body=`<div class="pairs">${q.pairs.map((pr,i)=>`<div class="pair" role="radiogroup" aria-label="${esc(pr[0])} or ${esc(pr[1])}">${pr.map(o=>`<label class="chip${s[i]===o?" on":""}"><input type="radio" name="p${q.id}_${i}" value="${esc(o)}" data-pair="${q.id}" data-i="${i}" ${s[i]===o?"checked":""}>${esc(o)}</label>`).join("")}</div>`).join("")}</div>`}
+      else if(q.type==="items"){const s=v||{};body=`<div class="items">${q.items.map(it=>`<div class="item"><span>${esc(it)}</span><div class="chips" role="radiogroup" aria-label="${esc(it)}">${q.states.map(st=>`<label class="chip${s[it]===st?" on":""}"><input type="radio" name="i${q.id}_${esc(it)}" value="${esc(st)}" data-item="${q.id}" data-it="${esc(it)}" ${s[it]===st?"checked":""}>${esc(st)}</label>`).join("")}</div></div>`).join("")}</div>`}
+      else if(q.type==="rows"){const rows=(v&&v.length)?v:[q.fields.map(()=> "")];
+        body=`<div class="rows" id="rows${q.id}">${rows.map((r,ri)=>`<div class="row">${q.fields.map((f,fi)=>`<input type="text" placeholder="${esc(f)}" aria-label="${esc(f)}" data-row="${q.id}" data-ri="${ri}" data-fi="${fi}" value="${esc(r[fi]||"")}">`).join("")}</div>`).join("")}</div>${q.single?"":`<button type="button" class="add" data-add="${q.id}">Add another</button>`}`}
+      d.innerHTML=lab+body+unsureHTML(q)+`<p class="err" id="e${q.id}" hidden></p>`;
+      sec.appendChild(d);
+    });
+    form.appendChild(sec);
+  });
+  const sub=document.createElement("div");sub.className="submit";
+  sub.innerHTML=`<button type="submit">Review my answers</button><p class="hint">This is a draft. Nothing is sent; you'll see the kickoff agenda the studio would prepare from your answers.</p>`;
+  form.appendChild(sub);
+}
+function qById(id){for(const p of PARTS)for(const q of p.qs)if(q.id===id)return q}
+form.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.dataset.row){const q=qById(t.dataset.row);const rows=data[q.id]&&data[q.id].length?data[q.id]:[q.fields.map(()=> "")];rows[+t.dataset.ri]=rows[+t.dataset.ri]||q.fields.map(()=> "");rows[+t.dataset.ri][+t.dataset.fi]=t.value;data[q.id]=rows}
+  else if(t.id&&t.id.startsWith("f")){const id=t.id.slice(1);if(id.endsWith("b")){const base=id.slice(0,-1);const q=qById(base);if(q.type==="date"){data[base]=data[base]||{};data[base].why=t.value}else data[id]=t.value}else{const q=qById(id);if(q&&q.type==="date"){data[id]=data[id]||{};data[id].date=t.value}else data[id]=t.value}}
+  clearErr(t.closest(".q"));save();
+});
+form.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.dataset.unsure){data[t.dataset.unsure+"_unsure"]=t.checked}
+  else if(t.dataset.pick){data[t.dataset.pick]=t.value;mark(t)}
+  else if(t.dataset.check){const s=new Set(data[t.dataset.check]||[]);t.checked?s.add(t.value):s.delete(t.value);data[t.dataset.check]=[...s];t.closest(".chip").classList.toggle("on",t.checked)}
+  else if(t.dataset.pair){const s=data[t.dataset.pair]||{};s[t.dataset.i]=t.value;data[t.dataset.pair]=s;mark(t)}
+  else if(t.dataset.item){const s=data[t.dataset.item]||{};s[t.dataset.it]=t.value;data[t.dataset.item]=s;mark(t)}
+  clearErr(t.closest(".q"));save();
+});
+function mark(input){const g=input.closest('[role="radiogroup"]');g.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c.querySelector("input").checked))}
+form.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.rank){const q=qById(b.dataset.rank);const order=data[q.id]||[];const o=b.dataset.opt;const i=order.indexOf(o);
+    if(i>=0)order.splice(i,1);else if(order.length<q.max)order.push(o);else{showErr(q.id,`You can pick up to ${q.max}. Tap one to remove it first.`);return}
+    data[q.id]=order;save();rerenderKeep(b)}
+  if(b.dataset.add){const q=qById(b.dataset.add);const rows=data[q.id]&&data[q.id].length?data[q.id]:[q.fields.map(()=> "")];rows.push(q.fields.map(()=> ""));data[q.id]=rows;save();rerenderKeep(b)}
+});
+function rerenderKeep(b){const id=b.dataset.rank||b.dataset.add;const opt=b.dataset.opt;render();const sel=opt?`[data-rank="${id}"][data-opt="${CSS.escape(opt)}"]`:`[data-add="${id}"]`;const n=form.querySelector(sel);if(n)n.focus({preventScroll:true})}
+function showErr(id,msg){const e=document.getElementById("e"+id);e.textContent=msg;e.hidden=false}
+function clearErr(q){if(!q)return;const e=q.querySelector(".err");if(e)e.hidden=true}
+function answered(q){const v=data[q.id];if(v==null)return false;
+  if(typeof v==="string")return v.trim()!=="";
+  if(Array.isArray(v))return v.some(r=>Array.isArray(r)?r.some(x=>x&&x.trim()):!!r);
+  if(typeof v==="object")return Object.values(v).some(x=>x&&String(x).trim());return false}
+function textOf(q){const v=data[q.id];if(typeof v==="string")return v;if(Array.isArray(v))return v.flat().join(" ");if(v&&typeof v==="object")return Object.values(v).join(" ");return ""}
+form.addEventListener("submit",e=>{
+  e.preventDefault();
+  let firstErr=null;
+  PARTS.forEach(p=>p.qs.forEach(q=>{if(q.req&&!answered(q)&&!data[q.id+"_unsure"]){showErr(q.id,"Please answer this, or tick \"Not sure\" so we can cover it on the call.");firstErr=firstErr||q.id}}));
+  if(firstErr){document.querySelector(`[data-q="${firstErr}"]`).scrollIntoView({behavior:"smooth",block:"center"});return}
+  const items=[];
+  PARTS.forEach(p=>p.qs.forEach(q=>{
+    if(data[q.id+"_unsure"])items.push([q,"Marked not sure"]);
+    else if(!answered(q))items.push([q,"Left blank"]);
+    else{const m=(textOf(q)+" "+(data[q.id+"b"]||"")).match(STAND_IN);if(m)items.push([q,`Uses "${m[0]}", which means different things to different people. Ask for an example.`])}
+  }));
+  const a=document.getElementById("agenda");
+  a.innerHTML=`<h2>Kickoff agenda (preview)</h2><p class="hint">This is what the studio would prepare from your answers: every blank, "not sure" and vague word becomes something to talk through on the call. ${items.length} item${items.length===1?"":"s"}.</p>${items.length?`<ol>${items.map(([q,why])=>`<li><b>${q.id}</b> ${esc(q.q)}<br><span class="why">${esc(why)}</span></li>`).join("")}</ol>`:"<p>Nothing to chase. Thank you!</p>"}`;
+  a.hidden=false;a.scrollIntoView({behavior:"smooth",block:"start"});
+});
+render();
+</script>
+
+</body></html>

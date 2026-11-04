@@ -1,0 +1,483 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Web Design Master Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: one process, two layouts (transit map, phase columns), four views that each show only what their reader needs. Detail sheet below. */
+:root{
+  --bg:#F2F3F4;
+  --sheet:#FFFFFF;
+  --ink:#1C2B3A;
+  --ink-soft:#56626E;
+  --rule:#D9DDE1;
+  --band:#E9ECEF;
+  --red:#B03A2A;
+  --track2:#2F6F8F;
+  --ok:#2F7A4B;
+  --dim:0.14;
+  --display:"Fraunces", Georgia, "Times New Roman", serif;
+  --ui:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11181F;--sheet:#18222C;--ink:#E7ECF0;--ink-soft:#A3AEB8;--rule:#2C3946;--band:#1C2732;
+  --red:#E57A63;--track2:#6FB3D2;--ok:#7CC496;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11181F;--sheet:#18222C;--ink:#E7ECF0;--ink-soft:#A3AEB8;--rule:#2C3946;--band:#1C2732;
+  --red:#E57A63;--track2:#6FB3D2;--ok:#7CC496;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1260px;margin:0 auto;padding-inline:20px;padding-block:28px 48px;display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--red);font-weight:600;margin:0 0 6px}
+h1{font-family:var(--display);font-weight:500;font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+.lede{margin:8px 0 0;color:var(--ink-soft);max-width:66ch}
+.bar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ctl>span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--rule);border-radius:999px;padding:3px;background:var(--sheet)}
+.seg button{font:inherit;font-size:13px;font-weight:500;border:0;background:transparent;color:var(--ink-soft);padding:6px 13px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+button:focus-visible,.stn:focus-visible,.card:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.viewnote{font-size:14px;color:var(--ink-soft);margin:0;max-width:80ch}
+.viewnote b{color:var(--ink);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:14px 18px;font-size:12px;color:var(--ink-soft);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:22px;height:0;border-top:5px solid var(--ink);border-radius:3px}
+.sw.t2{border-color:var(--track2)}.sw.fk{border-top:3px dashed var(--ink)}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:2.5px solid var(--ink);background:var(--sheet)}
+.dot.k{background:var(--ink)}
+.panel{border:1px solid var(--rule);background:var(--sheet)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.scroll svg{display:block;min-width:1160px;width:100%;height:auto}
+.stn{cursor:pointer}
+.cols{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0}
+@media (max-width:900px){.cols{grid-template-columns:1fr}}
+.col{padding:16px 14px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:10px;min-width:0}
+.col:nth-child(even){background:var(--band)}
+.col:last-child{border-right:0}
+@media (max-width:900px){.col{border-right:0;border-bottom:1px solid var(--rule)}}
+.col h4{font-family:var(--display);font-weight:500;font-size:17px;margin:0;color:var(--red)}
+.card{text-align:left;font:inherit;color:inherit;background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--ink);padding:9px 11px;cursor:pointer;display:grid;gap:3px;width:100%}
+.card.draft{border-left-style:dashed}
+.card[aria-current="true"]{border-color:var(--red);box-shadow:0 0 0 1px var(--red)}
+.card .nm{font-weight:600;font-size:14px}
+.card .ho{font-size:12px;color:var(--ink-soft)}
+.fork{border:1px dashed var(--ink-soft);padding:8px;display:grid;gap:8px}
+.fork>p{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--ink-soft)}
+.arrow{font-size:12px;color:var(--ink-soft);text-align:center;line-height:1}
+.chip{justify-self:start;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding:1px 6px;border:1px solid currentColor}
+.chip.done{color:var(--ok)}.chip.now,.chip.next{color:var(--red)}
+.sheet{padding:22px;display:grid;gap:18px}
+.sheet-head{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--rule);padding-bottom:14px}
+.sheet h2{font-family:var(--display);font-weight:500;font-size:26px;margin:0}
+.tags{display:flex;gap:8px;flex-wrap:wrap}
+.tag{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;padding:3px 8px;border:1px solid var(--rule);color:var(--ink-soft)}
+.tag.red{border-color:var(--red);color:var(--red)}.tag.ok{border-color:var(--ok);color:var(--ok)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px 28px}
+.grid>div{min-width:0}
+h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin:0 0 8px}
+.purpose{font-family:var(--display);font-size:19px;line-height:1.45;margin:0;max-width:62ch}
+ul.list{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+ul.list li{padding-left:16px;position:relative}
+ul.list li::before{content:"";position:absolute;left:0;top:.62em;width:7px;height:2px;background:var(--red)}
+.check{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;align-items:baseline}
+.kind{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--red);white-space:nowrap}
+.task{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px;padding:8px 0;border-top:1px dashed var(--rule)}
+.task:first-of-type{border-top:0}
+.tool{font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;background:var(--band);border:1px solid var(--rule);white-space:nowrap}
+.swap{font:inherit;font-size:12px;font-weight:600;color:var(--red);background:none;border:1px solid var(--red);border-radius:999px;padding:3px 10px;cursor:pointer}
+.code{font-family:var(--mono);font-size:12.5px;line-height:1.6;background:var(--band);border:1px solid var(--rule);padding:12px 14px;overflow-x:auto;white-space:pre;margin:0}
+.code .m{color:var(--red)}.code .p{color:var(--ok)}.code .k{color:var(--track2)}
+.handoffs{display:grid;gap:4px;font-size:14px}
+.handoffs b{font-weight:600}
+.need{border-left:3px solid var(--red);padding:8px 12px;background:var(--band)}
+.muted{color:var(--ink-soft);font-size:14px;margin:0}
+@media (prefers-reduced-motion: no-preference){.pulse{animation:pulse 1.8s ease-in-out infinite}}
+@keyframes pulse{0%,100%{stroke-opacity:1}50%{stroke-opacity:.25}}
+.dot.pr{border-color:var(--red);border-style:dashed;background:var(--sheet)}
+.card.proposed{border-left-color:var(--red);border-left-style:dashed}
+.chip.proposed{color:var(--red)}
+.qs{margin-top:20px}.qtable{width:100%;border-collapse:collapse;font-size:13px}.qtable th{text-align:left;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--rule)}.qtable td{padding:6px 8px;border-bottom:1px solid var(--rule);vertical-align:top}.qtable td:first-child{width:62%}</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Graphyte web design</p>
+    <h1>Web design master map</h1>
+    <p class="lede">Graphyte's web design process as it actually runs, plus two proposed improvements. Like a portolan chart, each view is drawn for one reader and shows only what that reader needs. The master map keeps everything.</p>
+  </header>
+
+  <div class="bar">
+    <div class="ctl"><span>Layout</span>
+      <div class="seg" role="group" aria-label="Layout">
+        <button type="button" id="l-transit" aria-pressed="true">Transit map</button>
+        <button type="button" id="l-columns" aria-pressed="false">Phase columns</button>
+      </div>
+    </div>
+    <div class="ctl"><span>View</span>
+      <div class="seg" role="group" aria-label="View">
+        <button type="button" id="v-master" aria-pressed="true">Master map</button>
+        <button type="button" id="v-client" aria-pressed="false">Client</button>
+        <button type="button" id="v-team" aria-pressed="false">Team</button>
+        <button type="button" id="v-agent" aria-pressed="false">Agent</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="viewnote" id="viewnote"></p>
+
+  <div class="legend" id="legend">
+    <span><i class="sw"></i>Main line</span>
+    <span><i class="sw t2"></i>Visual design line</span>
+    <span><i class="sw fk"></i>Fork: only some projects</span>
+    <span><i class="dot k"></i>Step you do today</span>
+    <span><i class="dot pr"></i>Proposed improvement</span>
+  </div>
+
+  <div class="panel" id="map"></div>
+  <section class="panel sheet" id="sheet" aria-live="polite"></section>
+</div>
+
+<script>
+const PHASES=["Discover","Define","Design","Build","Launch"];
+const STEPS=[
+{id:"intro",name:"Intro call",lab:["Intro call"],phase:0,
+ purpose:"A call of up to 30 minutes, often 15, that decides whether we're a good fit for a discovery call. Projects usually start from a referral. If it isn't a fit, the project stops here.",
+ client:"A short call to see if we're a good fit.",
+ output:["Fit or no fit, with the reason","What the client wants the new site to do","Rough budget and launch timing","Who decides and signs off","Who on their side handles content, and their time"],
+ hard:["The fit decision is written down, with the reason","Budget range and launch timing are written down","The person who signs off is named","Someone on the client's side owns content"],
+ judge:["We understand why they want a new site now","The budget fits the scope they described","We'd be glad to work with them"],
+ tasks:[["Hold the call, up to 30 minutes","Google Meet"],["Write up call notes","Notion"]],
+ questions:[["Why now? What's happening in the business that made this a priority?","Real urgency, or just browsing"],
+  ["A year after launch, how will you know the new site worked?","Outcomes or pages"],
+  ["What would make this project a failure, even if the site looks great?","Their real fears"],
+  ["What's wrong with what you have today? What would you keep?","How clear they are, and how much is a rebuild"],
+  ["Who else will have a say, and who signs off at the end?","Hidden decision makers"],
+  ["Have you worked with a studio or freelancer before? What went well, and what didn't?","Past experience you'd inherit"],
+  ["Who on your side will write copy, gather photos and answer questions, and how much time do they have?","Content risk"],
+  ["Is there a date this has to be live by, and what's driving it?","Fixed deadline or a wish"],
+  ["What range have you set aside for this?","Budget fit, before anyone quotes"],
+  ["Who else are you talking to, and what's making you hesitate?","Competition and doubts"],
+  ["If you couldn't hire anyone, what would you do instead?","Their real alternative"],
+  ["What made you reach out to us in particular?","What they value"],
+  ["What's the one thing a visitor should do on your site that they don't do today?","The conversion goal"],
+  ["What do customers say about you that you wish the website said?","The positioning"]],
+ redflags:["no named decision maker","no one with time for content","a budget far below what the scope needs"]},
+{id:"discovery",name:"Discovery call",lab:["Discovery","call"],phase:0,
+ purpose:"A separate 30-minute call, online or in person, to dig into goals, scope and must-have pages so the quote can be written. It sometimes follows straight on from a good intro call, which Matt decides on the day, but on the map it is always its own step.",
+ client:"A deeper call about your goals, so we can give you an accurate quote.",
+ output:["Goals in the client's own words","Scope and must-have pages","Budget and launch date"],
+ hard:["Every must-have page is listed","Budget and launch date are written down"],
+ judge:["We know enough to quote a fixed price"],
+ tasks:[["Hold the 30-minute call","Google Meet or in person"],["Write up call notes","Notion"]]},
+{id:"quote",name:"Quote",lab:["Quote"],phase:0,
+ purpose:"A fixed-price quote for the scope agreed on the discovery call.",
+ client:"Your fixed-price quote for the site.",
+ output:["Scope by page and feature","One fixed price","What isn't included, such as hosting"],
+ hard:["One fixed price, with no ranges","No hours or hourly rate","Third-party costs listed separately"],
+ judge:["The scope matches what the client said they need"],
+ tasks:[["Write the quote","Notion"]]},
+{id:"presentation",name:"Quote presentation call",lab:["Quote","presentation"],phase:0,
+ purpose:"Walk the client through the quote on a call and answer their questions. The client signs and pays the deposit after this call.",
+ client:"We walk you through the quote and answer your questions.",need:"Sign the quote and pay the deposit",
+ output:["Signed quote","Deposit paid","Every question answered"],
+ hard:["The quote is signed","The deposit is paid"],
+ judge:["The client understands what is and isn't included"],
+ tasks:[["Present the quote","Google Meet"],["Take the deposit","Stripe"]]},
+{id:"questionnaire",name:"Client questionnaire",lab:["Client","questionnaire"],phase:0,
+ purpose:"Once the quote is signed, the client answers a questionnaire about their business, audience and goals.",
+ client:"A questionnaire about your business, your customers and your goals.",need:"Fill in the questionnaire",
+ output:["An answer to every question","Links to sites they like and dislike","Brand assets they already have"],
+ hard:["Every required question is answered","At least two reference sites are given"],
+ judge:["Answers are specific enough to plan the site from"],
+ tasks:[["Send the questionnaire","TOOLQ"],["Chase any missing answers","Email"]]},
+{id:"kickoff",name:"Kickoff call",lab:["Kickoff","call"],phase:0,
+ purpose:"Walk through the questionnaire answers together, fill the gaps and agree the timeline.",
+ client:"We go through your answers together and agree dates.",
+ output:["A note on every unclear answer","Who signs off decisions","Timeline with review dates"],
+ hard:["Every unclear answer has a follow-up note","Review dates are agreed"],
+ judge:["Client and studio agree on what success looks like"],
+ tasks:[["Run the call","Google Meet"],["Record and summarise","Granola"]]},
+{id:"brief",name:"Brief",lab:["Brief"],phase:1,proposed:true,
+ purpose:"Proposed (D10). Today there's no written brief; the goals live in the call notes. This step turns the answers into three to five ranked goals that later steps are judged against.",
+ client:"Three to five goals for your site, in priority order.",need:"Approve the brief",
+ output:["3 to 5 goals, one sentence each","Goals ranked by priority","Who the site is mainly for"],
+ hard:["Between 3 and 5 goals","Each goal is one sentence","Goals are ranked"],
+ judge:["Every goal traces back to the client's answers"],
+ tasks:[["Write the brief","Notion"],["Get the client's approval","Email"]]},
+{id:"sitemap",name:"Sitemap",lab:["Sitemap"],phase:1,
+ purpose:"Plan every page of the site and how the pages nest.",
+ client:"A plan of every page on your site.",need:"Review the sitemap",
+ output:["Every page and how it nests","The purpose of each page","Key sections on each page"],
+ hard:["Top navigation has 7 items or fewer","Every page has a stated purpose"],
+ judge:["The structure reflects the client's priorities"],
+ tasks:[["Build the sitemap","Relume"],["Share it for review","Relume"]]},
+{id:"messaging",name:"Messaging",lab:["Messaging"],phase:1,
+ purpose:"One place where the client's voice gets honed and kept, read by the client and by any AI before it writes. The voice rules and word lists are agreed with the client; headlines and first lines are drafted, then tested against the personas.",
+ client:"We agree how you sound: the words that are you, the ones that aren't, and the lines that lead your pages.",need:"Help shape your voice rules and word lists",
+ output:["Voice rules","Words to use and avoid, with what to say instead","Headlines and first lines tested against personas"],
+ hard:["Voice rules are written down","Every word to avoid has an alternative","Each key page has a tested headline"],
+ judge:["It sounds like the client, not like us"],
+ tasks:[["Agree voice rules with the client","Messaging house"],["Build the words to use and avoid list","Messaging house"],["Draft headlines and first lines","Claude"],["Test lines against the personas","Messaging house"]]},
+{id:"wireframes",name:"Wireframes",lab:["Wireframes"],phase:1,
+ purpose:"Lay out the sections of every page in Relume, after the sitemap and before any visual design.",
+ client:"Simple layouts of each page, before the visual design.",need:"Review the wireframes",
+ output:["A wireframe for every page in the sitemap","The order of sections on each page"],
+ hard:["Every page in the sitemap has a wireframe"],
+ judge:["Each page's layout serves its stated purpose"],
+ tasks:[["Build wireframes","Relume"],["Share them for review","Relume"]]},
+{id:"copy",name:"Copy: AI draft, refined",lab:["Copy: AI draft,","refined"],phase:1,
+ purpose:"Copy for every section is drafted with AI from the questionnaire and call notes, then refined with the client.",
+ client:"We draft the words for each section, then refine them with you.",need:"Review and refine the copy",
+ output:["Copy for every section in the wireframes"],
+ hard:["Every section has copy","The client has approved the final copy"],
+ judge:["The copy sounds like the client, not like AI"],
+ tasks:[["Draft copy with AI","Claude"],["Refine with the client","Google Docs"]]},
+{id:"styleguide",name:"Style guide",lab:["Style guide"],phase:2,
+ purpose:"One proposed visual direction, set up straight away as colours, type and components. No choosing between directions.",
+ client:"The colours, fonts and building blocks for your site.",
+ output:["Colour palette","Type scale","Core components"],
+ hard:["Text colours meet contrast rules"],judge:["The direction fits what the client said about their brand"],
+ tasks:[["Set up the style guide","Figma"],["Match it to the component library","Relume"]]},
+{id:"keypages",name:"Key page designs",lab:["Key page","designs"],phase:2,
+ purpose:"Design the key pages in Figma from the wireframes, the copy and the style guide. The other pages are designed while building.",
+ client:"The finished look of your main pages.",
+ output:["Desktop and mobile designs for the key pages"],
+ hard:["Every key page has desktop and mobile designs","Only style guide colours and type are used"],
+ judge:["The other pages can be built from these without new designs"],
+ tasks:[["Design the key pages","Figma"],["Prepare files for the build","Figma"]]},
+{id:"signoff",name:"Design sign-off",lab:["Design","sign-off"],phase:2,
+ purpose:"The client approves the key page designs in writing before building starts.",
+ client:"You approve the designs before we build.",need:"Approve the designs",
+ output:["Written approval","A list of any final changes"],
+ hard:["Approval is written down"],
+ judge:["Remaining changes are small enough to make during the build"],
+ tasks:[["Present the designs","Figma"],["Record the approval","Email"]]},
+{id:"build",name:"Webflow build",lab:["Webflow","build"],phase:3,
+ purpose:"Build the site in Webflow, designing the remaining pages from the key pages as you go.",
+ client:"We build your site.",
+ output:["Every page built and responsive","Reusable components and classes"],
+ hard:["Key pages match their designs on desktop and phone","Class names follow the naming system"],
+ judge:["Pages designed during the build match the key pages"],
+ tasks:[["Build the pages","Webflow"],["Bring in library sections","Relume"]]},
+{id:"cms",name:"CMS setup",lab:["CMS setup"],phase:3,fork:"Does the site need a CMS?",
+ purpose:"Fork. When the site has repeating content, such as blog posts or case studies.",
+ client:"We set up the parts of your site you'll update often.",
+ output:["Collections and their fields","Sample entries in each collection"],
+ hard:["Every repeating section is driven by a collection"],
+ judge:["Field names make sense to the client"],
+ tasks:[["Set up collections","Webflow"],["Import existing content","Webflow"]]},
+{id:"check",name:"Click-through check",lab:["Click-through","check"],phase:3,
+ purpose:"Click through the whole site on desktop and phone before it goes live.",
+ client:"We test the site on desktop and phone.",
+ output:["A list of issues found and fixed"],
+ hard:["Every page opened on desktop and phone"],
+ judge:["Nothing feels unfinished"],
+ tasks:[["Click through every page","Webflow"],["Fix what you find","Webflow"]]},
+{id:"qalist",name:"QA checklist",lab:["QA checklist"],phase:3,proposed:true,
+ purpose:"Proposed. A written checklist run before launch, so the check is the same every time instead of depending on what you notice that day.",
+ client:"We test the site against a checklist.",
+ output:["A passing checklist","Every found issue fixed"],
+ hard:["No broken links","Works in current Chrome, Safari and on phones","Meets WCAG 2.1 AA basics","Every form sends"],
+ judge:["Nothing feels unfinished"],
+ tasks:[["Run the checklist","Webflow"],["Fix the issues","Webflow"]]},
+{id:"launch",name:"Go live",lab:["Go live"],phase:4,
+ purpose:"Connect the domain, set up search basics and publish.",
+ client:"Your site goes live.",need:"Give us access to your domain",
+ output:["Live site on the client's domain","Analytics working","Redirects from old pages"],
+ hard:["Domain and SSL work","Every old page redirects"],
+ judge:["Search titles and descriptions read well"],
+ tasks:[["Connect the domain","Webflow"],["Set up analytics","Google Analytics"]]},
+{id:"training",name:"Training session",lab:["Training","session"],phase:4,
+ purpose:"After launch, show the client how to edit their site and hand over every login.",
+ client:"We show you how to edit your site.",
+ output:["A training session or recording","Every login handed over"],
+ hard:["The client can edit a page on their own"],
+ judge:["The client feels confident running the site"],
+ tasks:[["Run the training","Google Meet"],["Hand over access","Webflow"]]}
+];
+const EDGES=[
+["intro","discovery","fit decision and call notes"],["discovery","quote","goals, scope and budget"],
+["quote","presentation","the quote"],["presentation","questionnaire","signed quote"],
+["questionnaire","kickoff","answers"],["kickoff","sitemap","answers and call notes"],
+["kickoff","brief","answers and call notes"],["brief","sitemap","goals and priorities"],
+["kickoff","styleguide","brand notes"],["kickoff","messaging","goals and audience"],["messaging","copy","voice rules and word lists"],
+["sitemap","wireframes","page list"],["wireframes","copy","section outlines"],
+["copy","keypages","final copy and page layouts"],["styleguide","keypages","colours, type and components"],
+["keypages","signoff","key page designs"],["signoff","build","approved designs"],
+["build","cms","collection list"],["build","check","built site"],["cms","check","filled collections"],
+["check","launch","fixed issue list"],
+["build","qalist","built site"],["qalist","launch","passing checklist"],
+["launch","training","live site"]
+];
+const byId=Object.fromEntries(STEPS.map(s=>[s.id,s]));
+const SAMPLE={name:"Copperleaf Bike Repair website",skip:new Set(["cms","brief","qalist"]),
+ status:{intro:"done",discovery:"done",quote:"done",presentation:"done",questionnaire:"done",kickoff:"done",sitemap:"done",messaging:"done",styleguide:"done",wireframes:"now",copy:"next"}};
+const AGENT={job:"Check the wireframes against their standard",show:new Set(["sitemap","wireframes"]),focus:"wireframes"};
+const VIEWS={
+ master:{note:"<b>Master map.</b> Everything you do today, every fork, and two proposed improvements drawn in red. The intro call has its question list and fit checks. Standards and tool details are still drafts to refine."},
+ client:{note:`<b>Client view</b> of an invented example project, ${SAMPLE.name}. Only this project's route, in plain words, with status and what's needed from the client. No standards, tools, proposals or internal notes.`},
+ team:{note:`<b>Team view</b> of the same example project. Only this project's route, with status, tasks, tools and standards for each step.`},
+ agent:{note:`<b>Agent view</b> for one job: "${AGENT.job}". The agent sees only the two steps that job needs, as structured data.`}
+};
+let layout="transit",view="master",selected="sitemap",toolQ="Tally";
+
+function visible(id){
+  if(view==="agent")return AGENT.show.has(id);
+  if(view==="client"||view==="team")return !SAMPLE.skip.has(id);
+  return true;
+}
+function status(id){return (view==="client"||view==="team")?(SAMPLE.status[id]||"later"):null}
+function pick(id){selected=id;draw();const n=document.querySelector(`[data-id="${id}"]`);if(n)n.focus({preventScroll:true});}
+
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent){const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);if(parent)parent.appendChild(n);return n}
+const MAINY=210;
+const T={intro:[45,MAINY],discovery:[120,MAINY],quote:[195,MAINY],presentation:[270,MAINY],questionnaire:[345,MAINY],kickoff:[435,MAINY],brief:[498,300],
+ sitemap:[560,MAINY],messaging:[650,MAINY],wireframes:[740,MAINY],copy:[840,MAINY],styleguide:[925,110],keypages:[1000,MAINY],
+ signoff:[1090,MAINY],build:[1240,MAINY],cms:[1330,300],check:[1420,MAINY],qalist:[1375,110],launch:[1510,MAINY],training:[1610,MAINY]};
+const LP={intro:"above",quote:"above",questionnaire:"above",kickoff:"left",sitemap:"above",messaging:"above",styleguide:"above",build:"left",check:"above",qalist:"above"};
+function lanePath(x1,y1,x2,y2,laneY){
+  const h=Math.min(70,(x2-x1)/2-30);
+  return `M${x1} ${y1} C${x1+h*.55} ${y1} ${x1+h*.45} ${laneY} ${x1+h} ${laneY} L${x2-h} ${laneY} C${x2-h*.45} ${laneY} ${x2-h*.55} ${y2} ${x2} ${y2}`;
+}
+function drawTransit(host){
+  const svg=el("svg",{viewBox:"0 0 1680 440",role:"img","aria-label":"Transit map of the web design process"},host);
+  const bands=[[0,480],[480,920],[920,1165],[1165,1465],[1465,1680]];
+  bands.forEach(([a,b],i)=>{
+    if(i%2===1)el("rect",{x:a,y:0,width:b-a,height:440,fill:"var(--band)"},svg);
+    const t=el("text",{x:a+14,y:30,fill:"var(--red)","font-family":"var(--display)","font-size":"16","font-weight":"500"},svg);t.textContent=PHASES[i];
+  });
+  const lines=el("g",{fill:"none","stroke-linecap":"round","stroke-linejoin":"round"},svg);
+  const seg=(ids,d,color,w,dash)=>{if(!ids.every(visible))return;el("path",{d,stroke:color,"stroke-width":w,"stroke-dasharray":dash||"none"},lines)};
+  const mainIds=["intro","discovery","quote","presentation","questionnaire","kickoff","sitemap","messaging","wireframes","copy","keypages","signoff","build","check","launch","training"];
+  for(let i=0;i<mainIds.length-1;i++){const a=T[mainIds[i]],b=T[mainIds[i+1]];seg([mainIds[i],mainIds[i+1]],`M${a[0]} ${a[1]} L${b[0]} ${b[1]}`,"var(--ink)",6)}
+  seg(["kickoff","styleguide","keypages"],lanePath(435,MAINY,1000,MAINY,110),"var(--track2)",6);
+  seg(["build","cms","check"],lanePath(1240,MAINY,1420,MAINY,300),"var(--ink)",3.5,"7 6");
+  seg(["kickoff","brief","sitemap"],lanePath(435,MAINY,560,MAINY,300),"var(--red)",3,"2 6");
+  seg(["build","qalist","launch"],lanePath(1240,MAINY,1510,MAINY,110),"var(--red)",3,"2 6");
+  const sg=el("g",{},svg);
+  STEPS.forEach(s=>{
+    if(!visible(s.id))return;
+    const [x,y]=T[s.id];const sel=s.id===selected;const st=status(s.id);
+    const g=el("g",{class:"stn",tabindex:"0",role:"button","data-id":s.id,"aria-label":s.name+(s.proposed?", proposed":""),transform:`translate(${x},${y})`},sg);
+    el("circle",{r:"16",fill:"transparent"},g);
+    if(sel)el("circle",{r:"15",fill:"none",stroke:"var(--red)","stroke-width":"2.5"},g);
+    const lane=s.id==="styleguide"?"var(--track2)":"var(--ink)";
+    if(s.proposed)el("circle",{r:"9",fill:"var(--sheet)",stroke:"var(--red)","stroke-width":"3","stroke-dasharray":"3 3"},g);
+    else el("circle",{r:"9",fill:lane,stroke:lane,"stroke-width":"3.5"},g);
+    if(st==="done")el("path",{d:"M-4 0L-1.2 3L4 -3.2",fill:"none",stroke:"var(--sheet)","stroke-width":"2","stroke-linecap":"round","stroke-linejoin":"round"},g);
+    if(st==="now")el("circle",{r:"15",fill:"none",stroke:"var(--red)","stroke-width":"2.5",class:"pulse"},g);
+    const mode=LP[s.id]||"below";
+    const anchor=mode==="left"?"end":"middle",lx=mode==="left"?-16:0;
+    const ly=mode==="above"?-26-(s.lab.length-1)*16:mode==="left"?32:32;
+    const t=el("text",{y:ly,"text-anchor":anchor,"font-size":"13.5","font-family":"var(--ui)","font-weight":sel?"700":"500",fill:s.proposed?"var(--red)":"var(--ink)"},g);
+    s.lab.forEach((line,i)=>{const sp=el("tspan",{x:lx,dy:i?"16":"0"},t);sp.textContent=line});
+    if(st&&st!=="done"&&st!=="later"){
+      const c=el("text",{x:lx,y:mode==="above"?ly-18:ly+16*s.lab.length+2,"text-anchor":anchor,"font-size":"10.5","font-weight":"700","letter-spacing":"1",fill:"var(--red)","font-family":"var(--ui)"},g);
+      c.textContent=st==="now"?"IN PROGRESS":"UP NEXT";
+    }
+    g.addEventListener("click",()=>pick(s.id));
+    g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pick(s.id)}});
+  });
+}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function outLabel(id){const o=EDGES.filter(e=>e[0]===id&&visible(e[1]));return o.length?"Hands over: "+[...new Set(o.map(e=>e[2]))].join(", "):"End of the process"}
+function cardHTML(s){
+  const st=status(s.id);
+  return `<button type="button" class="card${s.proposed?" proposed":""}" data-id="${s.id}" aria-current="${s.id===selected}">
+    ${s.proposed?`<span class="chip proposed">Proposed</span>`:""}
+    ${st&&st!=="later"?`<span class="chip ${st}">${st==="done"?"Done":st==="now"?"In progress":"Up next"}</span>`:""}
+    <span class="nm">${esc(s.name)}</span>
+    ${view==="client"?"":`<span class="ho">${esc(outLabel(s.id))}</span>`}
+  </button>`;
+}
+function drawColumns(host){
+  const wrap=document.createElement("div");wrap.className="cols";
+  PHASES.forEach((p,i)=>{
+    const steps=STEPS.filter(s=>s.phase===i&&visible(s.id));
+    let html=`<div class="col"><h4>${p}</h4>`;
+    steps.forEach(s=>{html+=s.fork?`<div class="fork"><p>Fork · ${esc(s.fork)}</p>${cardHTML(s)}</div>`:cardHTML(s)});
+    if(!steps.length)html+=`<p class="muted">Not needed for this view.</p>`;
+    html+=`</div>`;wrap.insertAdjacentHTML("beforeend",html);
+  });
+  host.appendChild(wrap);
+  wrap.querySelectorAll(".card").forEach(b=>b.addEventListener("click",()=>pick(b.dataset.id)));
+}
+function drawMap(){
+  const host=document.getElementById("map");host.innerHTML="";
+  if(layout==="transit"){const sc=document.createElement("div");sc.className="scroll";host.appendChild(sc);drawTransit(sc)}
+  else drawColumns(host);
+}
+function handoffs(s){
+  const ins=EDGES.filter(e=>e[1]===s.id&&visible(e[0])).map(e=>`<div><b>From ${esc(byId[e[0]].name)}:</b> ${esc(e[2])}</div>`).join("");
+  const outs=EDGES.filter(e=>e[0]===s.id&&visible(e[1])).map(e=>`<div><b>To ${esc(byId[e[1]].name)}:</b> ${esc(e[2])}</div>`).join("");
+  return `<div class="handoffs">${ins||"<div>Start of the process</div>"}${outs||"<div>End of the process</div>"}</div>`;
+}
+function tasksHTML(s){
+  return s.tasks.map(([t,tool])=>{
+    if(tool==="TOOLQ")return `<div class="task"><span>${esc(t)}</span><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="tool">${esc(toolQ)}</span><button type="button" class="swap" id="swap">Swap to ${toolQ==="Tally"?"Notion Forms":"Tally"}</button></span></div>`;
+    return `<div class="task"><span>${esc(t)}</span><span class="tool">${esc(tool)}</span></div>`}).join("")+
+    (s.id==="questionnaire"&&toolQ!=="Tally"?`<pre class="code">steps/client-questionnaire.md\n<span class="m">- tool: Tally</span>\n<span class="p">+ tool: Notion Forms</span>\nQuestions, output shape, standard and handoffs: unchanged</pre>`:"");
+}
+function checksHTML(s){return `<div class="check">${s.hard.map(h=>`<span class="kind">Yes / no</span><span>${esc(h)}</span>`).join("")}${s.judge.map(j=>`<span class="kind">Judgment</span><span>${esc(j)}</span>`).join("")}</div>`}
+function drawSheet(){
+  const s=byId[selected],box=document.getElementById("sheet");const st=status(s.id);
+  const stTag=st?`<span class="tag${st==="done"?" ok":st==="later"?"":" red"}">${st==="done"?"Done":st==="now"?"In progress":st==="next"?"Up next":"Coming up"}</span>`:"";
+  const base=`<span class="tag">${PHASES[s.phase]}</span>`+(s.proposed?`<span class="tag red">Proposed improvement</span>`:`<span class="tag ok">Done today</span>`)+(s.fork?`<span class="tag red">Fork · ${esc(s.fork)}</span>`:"");
+  if(view==="client"){
+    box.innerHTML=`<div class="sheet-head"><h2>${esc(s.name)}</h2><div class="tags">${stTag}</div></div>
+    <div class="grid"><div><h3>What happens</h3><p class="purpose">${esc(s.client)}</p></div>
+    <div><h3>What we need from you</h3>${s.need?`<div class="need">${esc(s.need)}</div>`:`<p class="muted">Nothing at this step.</p>`}</div></div>`;return;
+  }
+  if(view==="agent"){
+    const ins=EDGES.filter(e=>e[1]===s.id&&visible(e[0])).map(e=>`  - from: ${e[0]}\n    handoff: ${e[2]}`).join("\n")||"  []";
+    const y=`<span class="k">job:</span> review_output
+<span class="k">step:</span> ${s.id}
+<span class="k">inputs:</span>
+${ins}
+<span class="k">output_shape:</span>
+${s.output.map(o=>"  - "+o).join("\n")}
+<span class="k">standard:</span>
+  hard_checks:
+${s.hard.map(h=>"    - "+h).join("\n")}
+  judgment_checks:
+${s.judge.map(j=>"    - "+j).join("\n")}
+<span class="k">report:</span> pass or fail per check, with a reason for each judgment check`;
+    box.innerHTML=`<div class="sheet-head"><h2>${esc(s.name)}</h2><div class="tags"><span class="tag red">Agent job</span>${s.id===AGENT.focus?"":`<span class="tag">Input for the job</span>`}</div></div>
+    <p class="muted">${s.id===AGENT.focus?"What the agent reads to do its job. Tasks, tools, client notes and the rest of the map are left out.":"The agent reads this step only for what it hands over to the wireframes."}</p>
+    <pre class="code">${esc(y).replace(/&lt;span class=&quot;k&quot;&gt;/g,'<span class="k">').replace(/&lt;\/span&gt;/g,"</span>")}</pre>`;return;
+  }
+  const team=view==="team";
+  box.innerHTML=`<div class="sheet-head"><h2>${esc(s.name)}</h2><div class="tags">${stTag}${base}</div></div>
+  ${team?"":`<p class="purpose">${esc(s.purpose)}</p>`}
+  <div class="grid">
+    <div><h3>Tasks and tool links</h3>${tasksHTML(s)}</div>
+    <div><h3>Output shape</h3><ul class="list">${s.output.map(o=>`<li>${esc(o)}</li>`).join("")}</ul></div>
+    <div><h3>Standard</h3>${checksHTML(s)}</div>
+    <div><h3>Handoffs</h3>${handoffs(s)}</div>
+  </div>${s.questions?`<div class="qs"><h3>Questions to ask</h3><table class="qtable"><thead><tr><th>Question</th><th>What it tells you</th></tr></thead><tbody>${s.questions.map(([q,w])=>`<tr><td>${esc(q)}</td><td class="muted">${esc(w)}</td></tr>`).join("")}</tbody></table>${s.redflags?`<p class="muted"><b>Red flags:</b> ${s.redflags.map(esc).join(", ")}. Any one is usually reason to pass or reshape the project.</p>`:""}</div>`:""}`;
+  const sw=document.getElementById("swap");
+  if(sw)sw.addEventListener("click",()=>{toolQ=toolQ==="Tally"?"Notion Forms":"Tally";drawSheet();document.getElementById("swap").focus()});
+}
+function draw(){
+  document.getElementById("viewnote").innerHTML=VIEWS[view].note;
+  document.getElementById("legend").hidden=view!=="master";
+  drawMap();drawSheet();
+}
+function setLayout(l){layout=l;["transit","columns"].forEach(k=>document.getElementById("l-"+k).setAttribute("aria-pressed",k===l));draw()}
+function setView(v){
+  view=v;["master","client","team","agent"].forEach(k=>document.getElementById("v-"+k).setAttribute("aria-pressed",k===v));
+  if(v==="agent")selected=AGENT.focus;
+  else if(!visible(selected))selected=(v==="master"?"sitemap":"wireframes");
+  else if(v!=="master"&&selected==="sitemap")selected="wireframes";
+  draw();
+}
+document.getElementById("l-transit").onclick=()=>setLayout("transit");
+document.getElementById("l-columns").onclick=()=>setLayout("columns");
+["master","client","team","agent"].forEach(k=>document.getElementById("v-"+k).onclick=()=>setView(k));
+draw();
+</script>
+
+</body></html>

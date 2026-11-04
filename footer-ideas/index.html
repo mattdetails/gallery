@@ -1,0 +1,198 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Graphyte Footer Ideas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #F7F5F3; --fg: #1A1817; --muted: #6F6965; --line: #DBD3CA; --panel: #FFFFFF;
+    --ink: #1A1817; --ink-2: #262220; --sand: #F7F5F3; --sand-2: #ECE7E3; --orange: #FF5521; --orange-ink: #FFFFFF; --sand-on-ink: #F6EFE4; --sand-muted: #B8A182;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #120502; --fg: #F6EFE4; --muted: #B8A182; --line: #3D3126; --panel: #1A1817; color-scheme: dark; } }
+  :root[data-theme="dark"] { --bg: #120502; --fg: #F6EFE4; --muted: #B8A182; --line: #3D3126; --panel: #1A1817; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 Inter, system-ui, sans-serif; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  h1 { font: 800 28px/1.15 Manrope, sans-serif; letter-spacing: -0.01em; margin: 0 0 6px; text-wrap: balance; }
+  .lede { color: var(--muted); margin: 0 0 28px; max-width: 64ch; }
+  .idea { margin: 0 0 56px; }
+  .idea h2 { font: 700 13px/1.3 Manrope, sans-serif; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 6px; }
+  .idea p.why { margin: 0 0 14px; color: var(--muted); max-width: 70ch; }
+  .idea p.why b { color: var(--fg); font-weight: 600; }
+
+  /* ---------- shared footer bones ---------- */
+  .f { position: relative; overflow: hidden; border-radius: 14px; font-family: Inter, system-ui, sans-serif; isolation: isolate; }
+  .f .in { position: relative; z-index: 1; padding: clamp(40px, 6vw, 80px) clamp(20px, 5vw, 64px) 28px; }
+  .f .hex { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .f .hex svg { width: 100%; height: 100%; display: block; }
+  .f .top { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); gap: 40px; align-items: start; }
+  .f .cta h3 { font: 800 clamp(30px, 4.2vw, 56px)/1.05 Manrope, sans-serif; letter-spacing: -0.02em; margin: 0 0 12px; text-wrap: balance; max-width: 14ch; }
+  .f .cta p { margin: 0 0 22px; font-size: 17px; max-width: 42ch; }
+  .f .btn { display: inline-block; font: 600 15px Inter, sans-serif; padding: 13px 22px; border-radius: 6px; text-decoration: none; }
+  .f .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .f .cols h4 { font: 700 12px/1 Manrope, sans-serif; text-transform: uppercase; letter-spacing: .08em; margin: 0 0 14px; }
+  .f .cols a { display: block; text-decoration: none; font-weight: 500; margin: 0 0 10px; }
+  .f .bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: clamp(40px, 6vw, 80px); padding-top: 20px; font-size: 13px; }
+  .f .logo { display: inline-flex; align-items: center; gap: 10px; font: 800 20px Manrope, sans-serif; letter-spacing: -0.01em; text-decoration: none; color: inherit; }
+  .f2 .pill .logo svg { height: 22px; }
+  .f .logo svg { height: 30px; width: auto; display: block; }
+  @media (max-width: 760px) { .f .top { grid-template-columns: 1fr; } }
+
+  /* 1 · Ink bloom */
+  .f1 { background: var(--ink); color: var(--sand-on-ink); }
+  .f1 .btn { background: var(--orange); color: var(--orange-ink); }
+  .f1 .cols a, .f1 .bottom { color: var(--sand-muted); }
+  .f1 .cols h4 { color: var(--sand-on-ink); }
+  .f1 .bottom { border-top: 1px solid rgba(246,239,228,.14); }
+
+  /* 2 · Horizon */
+  .f2 { background: var(--sand); color: var(--ink); }
+  .f2 .btn { background: var(--orange); color: var(--orange-ink); }
+  .f2 .cols a, .f2 .bottom { color: #6F6965; }
+  .f2 .cols h4 { color: var(--ink); }
+  .f2 .in { padding-bottom: clamp(120px, 18vw, 220px); }
+  .f2 .bottom { margin-top: 40px; padding-top: 0; }
+  .f2 .pill { display: inline-flex; gap: 14px; align-items: center; background: rgba(247,245,243,.86); backdrop-filter: blur(6px); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
+
+  /* 3 · Stamp */
+  .f3 { background: var(--ink); color: var(--sand-on-ink); padding-top: clamp(60px, 8vw, 120px); }
+  .f3 .card { position: relative; overflow: hidden; background: var(--orange); color: var(--orange-ink); border-radius: 14px; padding: clamp(32px, 5vw, 64px); margin: 0 clamp(20px, 5vw, 64px); isolation: isolate; }
+  .f3 .card .hex { opacity: .22; }
+  .f3 .card .top { position: relative; z-index: 1; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  .f3 .card .btn { background: var(--ink); color: var(--sand-on-ink); }
+  .f3 .cta p { opacity: .9; }
+  .f3 .in { padding-top: clamp(40px, 5vw, 64px); }
+  .f3 .cols { grid-template-columns: repeat(3, auto); justify-content: start; gap: 48px; }
+  .f3 .cols a, .f3 .bottom { color: var(--sand-muted); }
+  .f3 .cols h4 { color: var(--sand-on-ink); }
+  .f3 .bottom { border-top: 1px solid rgba(246,239,228,.14); margin-top: 40px; }
+  @media (max-width: 760px) { .f3 .cols { grid-template-columns: 1fr 1fr; gap: 24px; } }
+
+  .note { font-size: 13px; color: var(--muted); margin-top: 10px; }
+</style>
+
+<div class="wrap">
+  <h1>Three footers with the hex pattern</h1>
+  <p class="lede">All three use the same hex lattice as the hero and the generator, drawn live here so you can resize the window and see how they hold up. Every one can be built on the Relume footer with a CSS background on the section, so none of them needs a custom component.</p>
+
+  <section class="idea">
+    <h2>1 · Ink bloom</h2>
+    <p class="why"><b>The safe pick.</b> The hero's bloom returns at the bottom of the page in the dark scheme, so the site opens and closes on the same mark. Orange cells on ink, dense in the corner, gone by the CTA. The CTA card on the homepage already sits in this scheme, so it reads as one dark band.</p>
+    <footer class="f f1">
+      <div class="hex" data-hex="corner" data-ground="#1A1817" data-cell="#FF5521" data-size="30" data-fe="0.44"></div>
+      <div class="in">
+        <div class="top">
+          <div class="cta">
+            <h3>Have a project in mind?</h3>
+            <p>Tell us what you need and we'll take it from there.</p>
+            <a class="btn" href="#">Let's chat</a>
+          </div>
+          <div class="cols">
+            <div><h4>Site</h4><a href="#">Work</a><a href="#">Services</a><a href="#">About</a><a href="#">Contact</a></div>
+            <div><h4>Email</h4><a href="#">matt@graphytedesign.com</a></div>
+          </div>
+        </div>
+        <div class="bottom">
+          <a class="logo" href="#"><svg height="30" role="img" aria-label="Graphyte" viewBox="0 0 656 152" fill="none" xmlns="http://www.w3.org/2000/svg"><mask id="stroke0_22041_4697-f1" fill="white"><path d="M63.3787 140.763C98.3818 140.763 126.757 112.362 126.757 77.327C126.757 42.2921 98.3818 13.8906 63.3787 13.8906C28.3756 13.8906 0 42.2921 0 77.327C0 112.362 28.3756 140.763 63.3787 140.763Z"/></mask><path d="M126.757 77.327C126.757 112.362 98.3818 140.763 63.3787 140.763C28.3756 140.763 0 112.362 0 77.327C0 42.2921 28.3756 13.8906 63.3787 13.8906C98.3818 13.8906 126.757 42.2921 126.757 77.327Z" stroke-width="23.0339" stroke="#FF5521" mask="url(#stroke0_22041_4697-f1)"/><path d="M83.4002 45.373L69.7778 58.6289H56.1532V98.3955L42.5286 111.651V45.3741L83.4002 45.373ZM83.4002 78.5122V111.651L69.7778 100.605V89.5589L56.1532 78.5131L83.4002 78.5122Z" fill-rule="evenodd" clip-rule="evenodd" fill="#F6EFE4"/><path d="M205.462 117.126C181.098 117.126 164.206 99.6203 164.206 76.0746C164.206 52.6312 181.507 35.023 205.462 35.023C224.811 35.2278 237.403 45.4651 242.521 57.5451L224.299 65.0183C221.637 58.9783 214.471 53.7573 205.974 53.7573C194.508 53.7573 184.681 62.9708 184.681 76.4841C184.681 89.9973 194.304 98.3919 205.872 98.3919C215.29 98.3919 223.48 93.478 225.323 85.2881H208.534V71.3654H245.9C247.742 101.463 229.111 117.126 205.462 117.126ZM255.052 116V58.1593H270.203L271.534 65.8373H272.046C274.605 59.6949 279.109 58.1593 284.945 58.1593H286.583V77.6102H282.897C277.471 77.6102 273.991 80.9885 273.991 88.5641V116H255.052ZM319.483 117.126C303.205 117.126 291.535 104.637 291.535 87.2332C291.535 69.5227 303.308 57.0332 319.483 57.0332C327.672 57.0332 334.634 60.5139 338.114 65.4278H338.524L339.036 58.1593H355.825V116H339.036L338.524 108.834H338.114C334.327 114.055 327.365 117.126 319.483 117.126ZM323.578 100.439C331.358 100.439 336.784 94.7064 336.784 87.1308C336.784 79.6576 331.358 73.8224 323.578 73.8224C316.411 73.8224 310.474 79.76 310.474 87.1308C310.474 94.7064 316.411 100.439 323.578 100.439ZM365.618 138.522V58.1593H383.431L383.841 66.042H384.353C387.629 61.0258 393.976 57.0332 402.78 57.0332C418.34 57.0332 429.909 69.6251 429.909 87.0285C429.909 104.841 417.624 117.126 402.882 117.126C394.999 117.126 388.243 114.055 385.172 109.653H384.557V138.522H365.618ZM397.866 100.337C405.134 100.337 410.97 94.3993 410.97 87.1308C410.97 79.5553 405.134 73.72 397.866 73.72C390.188 73.72 384.557 79.5553 384.557 87.1308C384.557 94.5017 390.188 100.337 397.866 100.337ZM437.347 116V36.1491H456.389V64.1993L456.901 64.3017C459.46 60.1044 464.271 57.0332 470.823 57.0332C481.572 57.0332 488.534 64.4041 488.534 79.3505V116H469.492V82.9336C469.492 76.3817 467.036 74.2319 463.043 74.2319C458.948 74.2319 456.389 77.5078 456.389 83.2407V116H437.347ZM503.07 138.522L511.157 115.181L491.502 58.1593H511.874L520.985 90.3044L529.892 58.1593H550.161L522.726 138.522H503.07ZM562.242 116V75.1532H554.564V58.1593H562.242V36.1491H581.284V58.1593H589.064V75.1532H581.284V116H562.242ZM623.812 117.126C605.589 117.126 592.895 104.432 592.895 87.438C592.895 70.5464 604.77 57.0332 623.402 57.0332C642.546 57.0332 654.933 71.4678 653.193 91.9424H611.527C612.858 99.0061 618.795 102.077 624.426 102.077C629.237 102.077 633.23 99.8251 635.277 96.0373L651.555 100.439C647.46 110.779 636.711 117.126 623.812 117.126ZM611.629 81.1932H635.584C634.254 75.9722 629.647 72.082 623.709 72.082C617.874 72.082 613.062 75.8698 611.629 81.1932Z" fill="#F6EFE4"/></svg></a>
+          <span>© 2026 Graphyte. All rights reserved.</span>
+        </div>
+      </div>
+    </footer>
+    <p class="note">Relume side: footer section on Scheme 3 (ink), background image set to a dark corner SVG from the generator, anchored bottom right, no repeat.</p>
+  </section>
+
+  <section class="idea">
+    <h2>2 · Horizon</h2>
+    <p class="why"><b>The quiet one.</b> Light footer, and the hexes form a horizon along the bottom edge rather than a corner: ink cells fading upward, with the last few rows going orange where they meet the page edge. The copyright line floats on the band in a small pill. Calmer than the dark options, and it keeps the page light all the way down.</p>
+    <footer class="f f2">
+      <div class="hex" data-hex="edge" data-ground="#F7F5F3" data-cell="#1A1817" data-accent="#FF5521" data-ac="0.09" data-size="22" data-fs="0.02" data-fe="0.46"></div>
+      <div class="in">
+        <div class="top">
+          <div class="cta">
+            <h3>Have a project in mind?</h3>
+            <p>Tell us what you need and we'll take it from there.</p>
+            <a class="btn" href="#">Let's chat</a>
+          </div>
+          <div class="cols">
+            <div><h4>Site</h4><a href="#">Work</a><a href="#">Services</a><a href="#">About</a><a href="#">Contact</a></div>
+            <div><h4>Email</h4><a href="#">matt@graphytedesign.com</a></div>
+          </div>
+        </div>
+        <div class="bottom">
+          <span class="pill">
+            <a class="logo" href="#"><svg height="24" role="img" aria-label="Graphyte" viewBox="0 0 1311 303" fill="none" xmlns="http://www.w3.org/2000/svg"><mask id="stroke0_22041_4667-f2" fill="white"><path d="M126.757 281.526C196.764 281.526 253.515 224.723 253.515 154.653C253.515 84.5831 196.764 27.7803 126.757 27.7803C56.7512 27.7803 0 84.5831 0 154.653C0 224.723 56.7512 281.526 126.757 281.526Z"/></mask><path d="M253.515 154.653C253.515 224.723 196.764 281.526 126.757 281.526C56.7512 281.526 0 224.723 0 154.653C0 84.5831 56.7512 27.7803 126.757 27.7803C196.764 27.7803 253.515 84.5831 253.515 154.653Z" stroke-width="46.0678" stroke="#FF5521" mask="url(#stroke0_22041_4667-f2)"/><path d="M166.8 90.7451L139.556 117.257H112.306V196.79L85.0571 223.302V90.7472L166.8 90.7451ZM166.8 157.023V223.302L139.556 201.208V179.117L112.306 157.025L166.8 157.023Z" fill-rule="evenodd" clip-rule="evenodd" fill="#1A1817"/><path d="M410.925 233.252C362.195 233.252 328.412 198.241 328.412 151.149C328.412 104.262 363.014 69.0461 410.925 69.0461C449.622 69.4556 474.805 89.9302 485.043 114.09L448.598 129.037C443.275 116.957 428.942 106.515 411.949 106.515C389.017 106.515 369.361 124.942 369.361 151.968C369.361 178.995 388.607 195.784 411.744 195.784C430.58 195.784 446.96 185.956 450.645 169.576H417.067V141.731H491.799C495.485 201.926 458.221 233.252 410.925 233.252ZM510.103 231V115.319H540.406L543.067 130.675H544.091C549.21 118.39 558.219 115.319 569.889 115.319H573.165V154.22H565.794C554.943 154.22 547.981 160.977 547.981 176.128V231H510.103ZM638.965 233.252C606.411 233.252 583.07 208.273 583.07 173.466C583.07 138.045 606.615 113.066 638.965 113.066C655.345 113.066 669.268 120.028 676.229 129.856H677.048L678.072 115.319H711.65V231H678.072L677.048 216.668H676.229C668.653 227.11 654.731 233.252 638.965 233.252ZM647.155 199.879C662.716 199.879 673.567 188.413 673.567 173.262C673.567 158.315 662.716 146.645 647.155 146.645C632.823 146.645 620.948 158.52 620.948 173.262C620.948 188.413 632.823 199.879 647.155 199.879ZM731.237 276.044V115.319H766.862L767.681 131.084H768.705C775.257 121.052 787.951 113.066 805.559 113.066C836.681 113.066 859.817 138.25 859.817 173.057C859.817 208.683 835.248 233.252 805.764 233.252C789.999 233.252 776.486 227.11 770.343 218.306H769.115V276.044H731.237ZM795.732 199.674C810.269 199.674 821.939 187.799 821.939 173.262C821.939 158.111 810.269 146.44 795.732 146.44C780.376 146.44 769.115 158.111 769.115 173.262C769.115 188.003 780.376 199.674 795.732 199.674ZM874.695 231V71.2983H912.777V127.399L913.801 127.603C918.92 119.209 928.543 113.066 941.647 113.066C963.145 113.066 977.068 127.808 977.068 157.701V231H938.985V164.867C938.985 151.763 934.071 147.464 926.086 147.464C917.896 147.464 912.777 154.016 912.777 165.481V231H874.695ZM1006.14 276.044L1022.31 229.362L983.004 115.319H1023.75L1041.97 179.609L1059.78 115.319H1100.32L1045.45 276.044H1006.14ZM1124.48 231V149.306H1109.13V115.319H1124.48V71.2983H1162.57V115.319H1178.13V149.306H1162.57V231H1124.48ZM1247.62 233.252C1211.18 233.252 1185.79 207.864 1185.79 173.876C1185.79 140.093 1209.54 113.066 1246.8 113.066C1285.09 113.066 1309.87 141.936 1306.39 182.885H1223.05C1225.72 197.012 1237.59 203.155 1248.85 203.155C1258.47 203.155 1266.46 198.65 1270.55 191.075L1303.11 199.879C1294.92 220.558 1273.42 233.252 1247.62 233.252ZM1223.26 161.386H1271.17C1268.51 150.944 1259.29 143.164 1247.42 143.164C1235.75 143.164 1226.12 150.74 1223.26 161.386Z" fill="#1A1817"/></svg></a>
+            <span>© 2026 Graphyte. All rights reserved.</span>
+          </span>
+        </div>
+      </div>
+    </footer>
+    <p class="note">Relume side: footer on Scheme 1 (sand), background image set to a light edge SVG anchored bottom centre and stretched to width, extra bottom padding so the links clear the band.</p>
+  </section>
+
+  <section class="idea">
+    <h2>3 · Stamp</h2>
+    <p class="why"><b>The bold one.</b> The CTA becomes an orange card stamped over the top edge of a dark footer, with the hex bloom inside the card in ink at low opacity. The pattern lives in the one place you want eyes to land, and the links sit quietly underneath. Loudest of the three, and the most "Graphyte" if you want the orange to carry the page out.</p>
+    <footer class="f f3">
+      <div class="card">
+        <div class="hex" data-hex="corner" data-origin="tr" data-ground="#FF5521" data-cell="#1A1817" data-size="30" data-fe="0.7"></div>
+        <div class="top">
+          <div class="cta">
+            <h3>Have a project in mind?</h3>
+            <p>Tell us what you need and we'll take it from there.</p>
+          </div>
+          <a class="btn" href="#">Let's chat</a>
+        </div>
+      </div>
+      <div class="in">
+        <div class="cols">
+          <div><h4>Site</h4><a href="#">Work</a><a href="#">Services</a><a href="#">About</a><a href="#">Contact</a></div>
+          <div><h4>Email</h4><a href="#">matt@graphytedesign.com</a></div>
+          <div><h4>Elsewhere</h4><a href="#">LinkedIn</a><a href="#">Dribbble</a></div>
+        </div>
+        <div class="bottom">
+          <a class="logo" href="#"><svg height="30" role="img" aria-label="Graphyte" viewBox="0 0 656 152" fill="none" xmlns="http://www.w3.org/2000/svg"><mask id="stroke0_22041_4697-f3" fill="white"><path d="M63.3787 140.763C98.3818 140.763 126.757 112.362 126.757 77.327C126.757 42.2921 98.3818 13.8906 63.3787 13.8906C28.3756 13.8906 0 42.2921 0 77.327C0 112.362 28.3756 140.763 63.3787 140.763Z"/></mask><path d="M126.757 77.327C126.757 112.362 98.3818 140.763 63.3787 140.763C28.3756 140.763 0 112.362 0 77.327C0 42.2921 28.3756 13.8906 63.3787 13.8906C98.3818 13.8906 126.757 42.2921 126.757 77.327Z" stroke-width="23.0339" stroke="#FF5521" mask="url(#stroke0_22041_4697-f3)"/><path d="M83.4002 45.373L69.7778 58.6289H56.1532V98.3955L42.5286 111.651V45.3741L83.4002 45.373ZM83.4002 78.5122V111.651L69.7778 100.605V89.5589L56.1532 78.5131L83.4002 78.5122Z" fill-rule="evenodd" clip-rule="evenodd" fill="#F6EFE4"/><path d="M205.462 117.126C181.098 117.126 164.206 99.6203 164.206 76.0746C164.206 52.6312 181.507 35.023 205.462 35.023C224.811 35.2278 237.403 45.4651 242.521 57.5451L224.299 65.0183C221.637 58.9783 214.471 53.7573 205.974 53.7573C194.508 53.7573 184.681 62.9708 184.681 76.4841C184.681 89.9973 194.304 98.3919 205.872 98.3919C215.29 98.3919 223.48 93.478 225.323 85.2881H208.534V71.3654H245.9C247.742 101.463 229.111 117.126 205.462 117.126ZM255.052 116V58.1593H270.203L271.534 65.8373H272.046C274.605 59.6949 279.109 58.1593 284.945 58.1593H286.583V77.6102H282.897C277.471 77.6102 273.991 80.9885 273.991 88.5641V116H255.052ZM319.483 117.126C303.205 117.126 291.535 104.637 291.535 87.2332C291.535 69.5227 303.308 57.0332 319.483 57.0332C327.672 57.0332 334.634 60.5139 338.114 65.4278H338.524L339.036 58.1593H355.825V116H339.036L338.524 108.834H338.114C334.327 114.055 327.365 117.126 319.483 117.126ZM323.578 100.439C331.358 100.439 336.784 94.7064 336.784 87.1308C336.784 79.6576 331.358 73.8224 323.578 73.8224C316.411 73.8224 310.474 79.76 310.474 87.1308C310.474 94.7064 316.411 100.439 323.578 100.439ZM365.618 138.522V58.1593H383.431L383.841 66.042H384.353C387.629 61.0258 393.976 57.0332 402.78 57.0332C418.34 57.0332 429.909 69.6251 429.909 87.0285C429.909 104.841 417.624 117.126 402.882 117.126C394.999 117.126 388.243 114.055 385.172 109.653H384.557V138.522H365.618ZM397.866 100.337C405.134 100.337 410.97 94.3993 410.97 87.1308C410.97 79.5553 405.134 73.72 397.866 73.72C390.188 73.72 384.557 79.5553 384.557 87.1308C384.557 94.5017 390.188 100.337 397.866 100.337ZM437.347 116V36.1491H456.389V64.1993L456.901 64.3017C459.46 60.1044 464.271 57.0332 470.823 57.0332C481.572 57.0332 488.534 64.4041 488.534 79.3505V116H469.492V82.9336C469.492 76.3817 467.036 74.2319 463.043 74.2319C458.948 74.2319 456.389 77.5078 456.389 83.2407V116H437.347ZM503.07 138.522L511.157 115.181L491.502 58.1593H511.874L520.985 90.3044L529.892 58.1593H550.161L522.726 138.522H503.07ZM562.242 116V75.1532H554.564V58.1593H562.242V36.1491H581.284V58.1593H589.064V75.1532H581.284V116H562.242ZM623.812 117.126C605.589 117.126 592.895 104.432 592.895 87.438C592.895 70.5464 604.77 57.0332 623.402 57.0332C642.546 57.0332 654.933 71.4678 653.193 91.9424H611.527C612.858 99.0061 618.795 102.077 624.426 102.077C629.237 102.077 633.23 99.8251 635.277 96.0373L651.555 100.439C647.46 110.779 636.711 117.126 623.812 117.126ZM611.629 81.1932H635.584C634.254 75.9722 629.647 72.082 623.709 72.082C617.874 72.082 613.062 75.8698 611.629 81.1932Z" fill="#F6EFE4"/></svg></a>
+          <span>© 2026 Graphyte. All rights reserved.</span>
+        </div>
+      </div>
+    </footer>
+    <p class="note">Relume side: footer on Scheme 3 with its CTA block styled as a card in Scheme 4 (orange), and the hex SVG as the card's background. If the card can't take a background in Relume, it becomes a global CTA section with top-and-bottom padding sitting directly above a plain footer.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  // The same hex-fade lattice as hexfade.py and the generator: pointy-top hexes, rows laid from the bottom,
+  // each cell scaled by its distance from the bloom origin (or from the bottom edge).
+  function hexSVG(w, h, o) {
+    const cell = o.size, rowH = cell * Math.sqrt(3) / 2, fullR = (cell / 2) * 0.86 / Math.cos(Math.PI / 6);
+    const diag = Math.hypot(w, h), fs = o.fs, fe = o.fe, ease = t => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
+    const ox = o.origin[1] === 'r' ? w : 0, oy = o.origin[0] === 'b' ? h : 0;
+    let out = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="${o.par}">`;
+    const by = { cell: [], accent: [] };
+    for (let j = -1; j < h / rowH + 3; j++) {
+      const cy = h - j * rowH, off = j % 2 ? cell / 2 : 0;
+      for (let i = -1; i < w / cell + 3; i++) {
+        const cx = i * cell + off;
+        const d = o.mode === 'edge' ? (h - cy) / h : Math.hypot(ox - cx, oy - cy) / diag;
+        const sc = 1 - ease((d - fs) / (fe - fs)); if (sc < 0.035) continue;
+        const r = fullR * sc; let p = 'M';
+        for (let a = 0; a < 6; a++) { const t = Math.PI / 180 * (60 * a - 30); p += (a ? 'L' : '') + (cx + r * Math.cos(t)).toFixed(1) + ',' + (cy + r * Math.sin(t)).toFixed(1); }
+        by[o.accent && d < o.ac ? 'accent' : 'cell'].push(p + 'z');
+      }
+    }
+    out += `<path fill="${o.cell}" d="${by.cell.join('')}"/>`;
+    if (by.accent.length) out += `<path fill="${o.accent}" d="${by.accent.join('')}"/>`;
+    return out + '</svg>';
+  }
+  document.querySelectorAll('.hex').forEach(el => {
+    const d = el.dataset, mode = d.hex, origin = d.origin || 'br';
+    // Draw at a fixed design size, then let preserveAspectRatio anchor it: slice keeps the dense corner pinned.
+    const w = mode === 'edge' ? 1400 : 1000, h = mode === 'edge' ? 420 : 620;
+    const par = mode === 'edge' ? 'xMidYMax slice' : (origin === 'tr' ? 'xMaxYMin slice' : 'xMaxYMax slice');
+    el.innerHTML = hexSVG(w, h, { mode, origin, size: Number(d.size), cell: d.cell, ground: d.ground, accent: d.accent || null, ac: Number(d.ac || 0),
+      fs: Number(d.fs || 0), fe: Number(d.fe || 0.62), par });
+  });
+})();
+</script>
+
+</body></html>

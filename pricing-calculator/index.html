@@ -1,0 +1,898 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Graphyte Pricing Calculator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+  /* Deliberately single-theme: Graphyte's light sand / ink / orange brand. */
+  :root { color-scheme: light; --sand:#F7F5F3; --sand-2:#ECE7E3; --sand-3:#DBD3CA; --card:#FFFFFF; --ink:#080707; --ink-2:#1A1817; --muted:rgba(8,7,7,.62); --line:rgba(8,7,7,.14); --orange:#FF5521; --orange-soft:rgba(255,85,33,.1); --green:#2F7A4B; --green-soft:rgba(47,122,75,.12); --amber:#9A6200; --amber-soft:rgba(186,120,0,.13); }
+  * { box-sizing: border-box; }
+  body { background: var(--sand); color: var(--ink); font: 400 15px/1.5 "Manrope", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 76rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 1.5rem 4rem; }
+  h1, h2, h3 { font-family: "Instrument Sans", system-ui, sans-serif; letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+  h1 { font-size: 1.6rem; font-weight: 600; }
+  h2 { font-size: 1.1rem; font-weight: 600; }
+  h3 { font-size: .95rem; font-weight: 600; }
+  p { margin: 0; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: .6rem; }
+  .hex { width: 14px; height: 16px; background: var(--orange); clip-path: polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%); flex: none; }
+  .tabs { display: flex; gap: 2px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 3px; }
+  .tabs button { border: 0; background: transparent; font: 600 .85rem "Instrument Sans", sans-serif; padding: .5rem .9rem; border-radius: 6px; cursor: pointer; color: var(--ink); }
+  .tabs button[aria-selected="true"] { background: var(--ink); color: #fff; }
+  .notice { margin-top: 1rem; padding: .75rem 1rem; border-radius: 8px; font-size: .88rem; background: var(--amber-soft); color: var(--amber); }
+  .notice b { color: var(--ink); }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 22rem; gap: 1.25rem; margin-top: 1.25rem; align-items: start; }
+  @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+  .card { background: var(--card); border-radius: 10px; padding: 1.1rem 1.2rem; min-width: 0; }
+  .stack { display: grid; gap: 1rem; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .75rem; }
+  label.f { display: grid; gap: .3rem; font-size: .78rem; font-weight: 600; color: var(--muted); }
+  input[type=text], input[type=number], select, textarea { font: 500 .95rem "Manrope", sans-serif; color: var(--ink); background: var(--sand); border: 1px solid var(--line); border-radius: 6px; padding: .55rem .65rem; width: 100%; min-width: 0; }
+  textarea { resize: vertical; min-height: 4rem; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--orange); outline-offset: 1px; }
+  .svc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); gap: .6rem; }
+  .svc-toggle { display: flex; align-items: center; gap: .6rem; border: 1px solid var(--line); border-radius: 8px; padding: .7rem .8rem; cursor: pointer; background: var(--sand); font-weight: 600; }
+  .svc-toggle input { accent-color: var(--orange); width: 1.05rem; height: 1.05rem; }
+  .svc-toggle:has(input:checked) { border-color: var(--orange); background: var(--orange-soft); }
+  .svc { border-top: 1px solid var(--line); padding-top: 1rem; display: grid; gap: .9rem; }
+  .svc-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
+  .svc-head .amt { font: 600 1rem "Instrument Sans", sans-serif; }
+  /* Complexity: four tap targets, not a slider */
+  .levels { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; background: var(--sand); border: 1px solid var(--line); border-radius: 8px; padding: 4px; }
+  .levels button { border: 0; background: transparent; border-radius: 6px; padding: .55rem .25rem; cursor: pointer; color: var(--ink); display: grid; gap: .1rem; justify-items: center; font: 600 .85rem "Manrope", sans-serif; transition: background .12s ease, color .12s ease; }
+  .levels button small { font-size: .7rem; font-weight: 500; color: var(--muted); }
+  .levels button:hover { background: var(--sand-2); }
+  .levels button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .levels button[aria-pressed="true"] small { color: rgba(255,255,255,.7); }
+  /* Price picker: a real slider */
+  .pick-range { -webkit-appearance: none; appearance: none; width: 100%; height: 32px; background: transparent; margin: 0; cursor: pointer; touch-action: pan-y; }
+  .pick-range:disabled { cursor: default; opacity: .4; }
+  .pick-range::-webkit-slider-runnable-track { height: 10px; border-radius: 999px; background: linear-gradient(to right, var(--orange) 0 var(--pct, 0%), var(--sand-3) var(--pct, 0%) 100%); }
+  .pick-range::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; margin-top: -9px; border-radius: 50%; background: #fff; border: 3px solid var(--orange); box-shadow: 0 2px 6px rgba(8,7,7,.22); transition: transform .1s ease; }
+  .pick-range:active::-webkit-slider-thumb { transform: scale(1.12); }
+  .pick-range::-moz-range-track { height: 10px; border-radius: 999px; background: var(--sand-3); }
+  .pick-range::-moz-range-progress { height: 10px; border-radius: 999px; background: var(--orange); }
+  .pick-range::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 3px solid var(--orange); box-shadow: 0 2px 6px rgba(8,7,7,.22); }
+  .pick-ends { display: flex; justify-content: space-between; font-size: .75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .chips { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .chips button { border: 1px solid var(--line); background: var(--sand); border-radius: 6px; padding: .45rem .2rem; font: 600 .78rem "Manrope", sans-serif; cursor: pointer; color: var(--ink); }
+  .chips button[aria-pressed="true"] { border-color: var(--orange); background: var(--orange-soft); }
+  .pick-where { font-size: .8rem; color: var(--muted); }
+  .checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: .4rem .9rem; }
+  .check { display: flex; align-items: center; gap: .5rem; font-size: .9rem; cursor: pointer; padding: .2rem 0; }
+  .check input { accent-color: var(--orange); width: 1rem; height: 1rem; flex: none; }
+  .check .p { margin-left: auto; color: var(--muted); font-size: .8rem; white-space: nowrap; }
+  .seg { display: flex; gap: 2px; background: var(--sand); border: 1px solid var(--line); border-radius: 8px; padding: 3px; flex-wrap: wrap; }
+  .seg button { flex: 1; border: 0; background: transparent; padding: .45rem .6rem; border-radius: 6px; font: 600 .82rem "Manrope", sans-serif; cursor: pointer; color: var(--ink); min-width: 5rem; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .muted { color: var(--muted); font-size: .82rem; }
+  /* Desktop: the right column stays in view while you scroll, price first */
+  /* max-height leaves room for the page's bottom padding, so it never gets pushed up at the end of the page */
+  .result { position: sticky; top: 1rem; display: grid; gap: 1rem; max-height: calc(100dvh - 6rem); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  .result .pick { order: -1; }
+  /* Phones: a price bar fixed to the bottom of the screen */
+  .pricebar { display: none; }
+  @media (max-width: 900px) {
+    .result { position: static; max-height: none; overflow: visible; }
+    .pricebar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; gap: .75rem; align-items: center; justify-content: space-between;
+      background: var(--ink); color: #fff; border-top: 1px solid rgba(255,255,255,.12);
+      padding: .7rem max(16px, env(safe-area-inset-right, 0px)) calc(.7rem + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+    .pricebar[hidden] { display: none; }
+    .pricebar .pb-main { display: grid; }
+    .pricebar .pb-main small { font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.6); font-weight: 700; }
+    .pricebar .pb-main b { font: 600 1.45rem/1.1 "Instrument Sans", sans-serif; }
+    .pricebar .pb-range { font-size: .78rem; color: rgba(255,255,255,.7); text-align: right; font-variant-numeric: tabular-nums; }
+    .pricebar button { border: 0; background: var(--orange); color: #fff; font: 600 .85rem "Instrument Sans", sans-serif; padding: .55rem .8rem; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+    body.has-bar .wrap { padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); }
+  }
+  .range { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  .big { background: var(--sand); border-radius: 8px; padding: .75rem .85rem; }
+  .big span { display: block; font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .big b { font: 600 1.45rem/1.2 "Instrument Sans", sans-serif; }
+  .lines { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; font-size: .85rem; }
+  .lines li { display: flex; justify-content: space-between; gap: .75rem; }
+  .lines li span:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .lines li.sub { border-top: 1px solid var(--line); padding-top: .4rem; font-weight: 700; }
+  .lines li.neg span:last-child { color: var(--green); }
+  .lines li.pos span:last-child { color: var(--ink); }
+  .flag { padding: .6rem .75rem; border-radius: 8px; font-size: .85rem; }
+  .flag.low { background: var(--amber-soft); color: var(--amber); }
+  .flag.ok { background: var(--green-soft); color: var(--green); }
+  .flag.high { background: var(--orange-soft); color: #A8350F; }
+  .pick { display: grid; gap: .5rem; }
+  .pick .val { font: 600 2rem/1.1 "Instrument Sans", sans-serif; }
+  .btn { border: 0; border-radius: 6px; background: var(--orange); color: #fff; font: 600 .95rem "Instrument Sans", sans-serif; padding: .7rem 1rem; cursor: pointer; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .btn.small { padding: .4rem .7rem; font-size: .82rem; }
+  .status { font-size: .82rem; color: var(--muted); min-height: 1.2em; }
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .86rem; }
+  th, td { text-align: left; padding: .55rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .set-table input { padding: .4rem .5rem; font-size: .88rem; }
+  .set-table td { padding: .35rem .4rem; }
+  .badge { display: inline-block; font: 700 .68rem "Manrope", sans-serif; letter-spacing: .06em; text-transform: uppercase; background: var(--amber-soft); color: var(--amber); padding: .2rem .45rem; border-radius: 4px; vertical-align: middle; }
+  .empty { padding: 2rem 1rem; text-align: center; color: var(--muted); }
+  /* ---- Settings ---- */
+  .set-layout { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: 1.25rem; margin-top: 1.25rem; align-items: start; }
+  .set-nav { position: sticky; top: 1rem; display: grid; gap: 2px; background: var(--card); border-radius: 10px; padding: .4rem; }
+  .set-nav button { text-align: left; border: 0; background: transparent; padding: .65rem .75rem; border-radius: 6px; font: 600 .9rem "Manrope", sans-serif; color: var(--ink); cursor: pointer; display: flex; justify-content: space-between; gap: .5rem; }
+  .set-nav button small { color: var(--muted); font-weight: 500; }
+  .set-nav button:hover { background: var(--sand); }
+  .set-nav button[aria-current="true"] { background: var(--ink); color: #fff; }
+  .set-nav button[aria-current="true"] small { color: rgba(255,255,255,.65); }
+  @media (max-width: 760px) {
+    .set-layout { grid-template-columns: minmax(0, 1fr); }
+    .set-nav { position: static; display: flex; overflow-x: auto; scrollbar-width: none; }
+    .set-nav button { flex: none; white-space: nowrap; }
+    .set-nav button small { display: none; }
+  }
+  .set-panel { display: grid; gap: 1.25rem; padding: 1.4rem; padding-bottom: 4.5rem; }
+  .set-panel > header { display: grid; gap: .3rem; }
+  .set-panel > header p { color: var(--muted); font-size: .9rem; max-width: 40rem; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pills button { border: 1px solid var(--line); background: var(--sand); border-radius: 999px; padding: .45rem .85rem; font: 600 .85rem "Manrope", sans-serif; cursor: pointer; color: var(--ink); }
+  .pills button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .inp { display: flex; align-items: center; background: var(--sand); border: 1px solid var(--line); border-radius: 6px; min-width: 0; }
+  .inp:focus-within { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-soft); }
+  .inp > span { padding: 0 .1rem 0 .65rem; color: var(--muted); font-weight: 600; font-size: .9rem; }
+  .inp > span.after { padding: 0 .65rem 0 .1rem; }
+  .inp input, .inp select { border: 0; background: transparent; padding: .6rem .65rem; font: 500 1rem "Manrope", sans-serif; color: var(--ink); width: 100%; min-width: 0; outline: none; }
+  .inp input[type=number] { font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
+  .inp input::-webkit-outer-spin-button, .inp input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .fld { display: grid; gap: .35rem; }
+  .fld > label, .fld > .lbl { font-size: .78rem; font-weight: 700; color: var(--muted); }
+  .fld .help { font-size: .8rem; color: var(--muted); }
+  .base-row { display: grid; grid-template-columns: minmax(0, 1fr) 12rem; gap: .75rem; }
+  .base-row .inp input { font: 600 1.25rem "Instrument Sans", sans-serif; }
+  .rows { display: grid; gap: .5rem; }
+  .rowhead, .erow { display: grid; grid-template-columns: minmax(0, 1fr) 9rem 2.4rem; gap: .5rem; align-items: center; }
+  .rowhead { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 0 .1rem; }
+  .erow.cx { grid-template-columns: minmax(0, 1fr) 8rem minmax(0, 10rem); }
+  .erow.cx .eg { font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .erow.pass { grid-template-columns: minmax(0, 1fr) 7.5rem 7rem 2.4rem; }
+  @media (max-width: 560px) {
+    .base-row { grid-template-columns: minmax(0, 1fr); }
+    .rowhead { display: none !important; }
+    /* Name full width with the remove button beside it, amounts on the line below */
+    .rows { gap: .9rem; }
+    .erow { grid-template-columns: minmax(0, 1fr) 2.4rem; }
+    .erow > :nth-child(1) { grid-column: 1; grid-row: 1; }
+    .erow > :nth-child(2) { grid-column: 1; grid-row: 2; }
+    .erow > :nth-child(3) { grid-column: 2; grid-row: 1; }
+    .erow.pass { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 2.4rem; }
+    .erow.pass > :nth-child(1) { grid-column: 1 / 3; grid-row: 1; }
+    .erow.pass > :nth-child(2) { grid-column: 1; grid-row: 2; }
+    .erow.pass > :nth-child(3) { grid-column: 2; grid-row: 2; }
+    .erow.pass > :nth-child(4) { grid-column: 3; grid-row: 1; }
+    .erow.cx { grid-template-columns: minmax(0, 1fr) 6.5rem; }
+    .erow.cx > :nth-child(2) { grid-column: 2; grid-row: 1; }
+    .erow.cx .eg { grid-column: 1 / -1; grid-row: 2; }
+    .stackcard .top-row { grid-template-columns: minmax(0, 1fr) 2.4rem; }
+    .stackcard .top-row > :nth-child(1) { grid-column: 1; grid-row: 1; }
+    .stackcard .top-row > :nth-child(2) { grid-column: 1; grid-row: 2; max-width: 9rem; }
+    .stackcard .top-row > :nth-child(3) { grid-column: 2; grid-row: 1; }
+  }
+  .icon-btn { width: 2.4rem; height: 2.4rem; border: 1px solid transparent; background: transparent; border-radius: 6px; cursor: pointer; color: var(--muted); font-size: 1.15rem; line-height: 1; display: grid; place-items: center; }
+  .icon-btn:hover { background: var(--sand); color: var(--ink); }
+  .icon-btn.confirm { background: #FBE3DB; color: #A8350F; font-size: .7rem; font-weight: 700; width: auto; padding: 0 .5rem; }
+  .add { justify-self: start; border: 1px dashed var(--sand-3); background: transparent; border-radius: 6px; padding: .55rem .9rem; font: 600 .88rem "Manrope", sans-serif; color: var(--ink); cursor: pointer; }
+  .add:hover { border-color: var(--orange); background: var(--orange-soft); }
+  .stackcard { border: 1px solid var(--line); border-radius: 8px; padding: 1rem; display: grid; gap: .85rem; }
+  .stackcard .top-row { display: grid; grid-template-columns: minmax(0, 1fr) 8rem 2.4rem; gap: .5rem; align-items: end; }
+  .chipset { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chipset button { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: .3rem .7rem; font: 600 .78rem "Manrope", sans-serif; color: var(--muted); cursor: pointer; }
+  .chipset button[aria-pressed="true"] { background: var(--orange-soft); border-color: var(--orange); color: var(--ink); }
+  .savebar { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 25; display: flex; align-items: center; gap: .5rem; background: var(--ink); color: #fff; padding: .55rem .9rem; border-radius: 999px; font: 600 .82rem "Manrope", sans-serif; box-shadow: 0 6px 20px rgba(8,7,7,.18); }
+  .savebar .dot { width: 8px; height: 8px; border-radius: 50%; background: #5BC587; }
+  .savebar.saving .dot { background: var(--orange); }
+  .savebar.error .dot { background: #E5484D; }
+  [hidden] { display: none !important; }
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><span class="hex"></span><h1>Pricing calculator</h1> <span id="example-badge" class="badge" hidden>Example numbers</span></div>
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="quote" aria-selected="true">Quote</button>
+      <button role="tab" data-tab="history" aria-selected="false">History</button>
+      <button role="tab" data-tab="settings" aria-selected="false">Settings</button>
+    </div>
+  </div>
+  <div id="notice" class="notice" hidden></div>
+
+  <!-- QUOTE -->
+  <section id="tab-quote">
+    <div class="layout">
+      <div class="stack">
+        <div class="card stack">
+          <h2>Client</h2>
+          <div class="row">
+            <label class="f">Client<input type="text" id="q-client" placeholder="Business name"></label>
+            <label class="f">Project<input type="text" id="q-project" placeholder="e.g. New website + booking"></label>
+          </div>
+        </div>
+
+        <div class="card stack">
+          <h2>Services</h2>
+          <div class="svc-grid" id="svc-toggles"></div>
+          <div id="svc-details" class="stack"></div>
+        </div>
+
+        <div class="card stack">
+          <h2>Risk</h2>
+          <div class="checks" id="risk-checks"></div>
+        </div>
+
+        <div class="card stack">
+          <h2>Timeline</h2>
+          <div class="seg" id="timeline-seg"></div>
+        </div>
+
+        <div class="card stack">
+          <h2>Relationship</h2>
+          <div class="checks" id="rel-checks"></div>
+          <p class="muted">Shown as its own line so the price for the work stays honest.</p>
+        </div>
+
+        <div class="card stack">
+          <h2>Value check</h2>
+          <div class="row">
+            <label class="f">Value per sale / customer ($)<input type="number" id="v-sale" min="0" step="1" inputmode="decimal" placeholder="e.g. 1000000 for a home"></label>
+            <label class="f">Extra sales per year from the work<input type="number" id="v-count" min="0" step="0.5" inputmode="decimal" placeholder="Be conservative"></label>
+          </div>
+          <p class="muted" id="v-note">The value price is your target share of the client's first-year value, set in Settings.</p>
+        </div>
+
+        <div class="card stack">
+          <h2>Budget</h2>
+          <label class="f">What the client said they can spend ($)<input type="number" id="b-budget" min="0" step="100" inputmode="decimal" placeholder="Leave blank if unknown"></label>
+          <p class="muted">A reality check only. It never changes the price.</p>
+        </div>
+      </div>
+
+      <aside class="result">
+        <div class="card stack">
+          <h2>Range</h2>
+          <div class="range">
+            <div class="big"><span>Floor</span><b id="r-floor">-</b></div>
+            <div class="big"><span>Stretch</span><b id="r-stretch">-</b></div>
+          </div>
+          <ul class="lines" id="r-lines"></ul>
+          <div id="r-value" class="muted"></div>
+          <div id="r-budget" class="flag" hidden></div>
+        </div>
+
+        <div class="card stack" id="pass-card" hidden>
+          <h3>Pass-through costs <span class="muted">(client pays, not in your fee)</span></h3>
+          <ul class="lines" id="r-pass"></ul>
+        </div>
+
+        <div class="card pick">
+          <h2>Your number</h2>
+          <div class="val" id="p-val">-</div>
+          <div class="pick-where" id="p-where"></div>
+          <input type="range" class="pick-range" id="p-slider" min="0" max="1" step="1" value="0" aria-label="Your price, between floor and stretch">
+          <div class="pick-ends"><span id="p-min">Floor</span><span id="p-max">Stretch</span></div>
+          <div class="chips" id="p-chips">
+            <button type="button" data-pickpct="0">Floor</button>
+            <button type="button" data-pickpct="25">25%</button>
+            <button type="button" data-pickpct="50">Mid</button>
+            <button type="button" data-pickpct="75">75%</button>
+            <button type="button" data-pickpct="100">Stretch</button>
+          </div>
+          <label class="f">Or type it<input type="number" id="p-input" min="0" step="50" inputmode="decimal"></label>
+          <p class="muted" id="p-split"></p>
+          <label class="f">Notes<textarea id="q-notes" placeholder="Why this number, what's in or out"></textarea></label>
+          <button class="btn" id="save-quote">Save quote</button>
+          <button class="btn ghost small" id="new-quote" type="button">Start a new quote</button>
+          <div class="status" id="save-status"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <div class="pricebar" id="pricebar" hidden>
+    <div class="pb-main"><small>Your number</small><b id="pb-val">-</b></div>
+    <div class="pb-range" id="pb-range"></div>
+    <button type="button" id="pb-go">Adjust</button>
+  </div>
+
+  <!-- HISTORY -->
+  <section id="tab-history" hidden>
+    <div class="card" style="margin-top:1.25rem">
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Date</th><th>Client</th><th>Project</th><th>Services</th><th class="num">Floor</th><th class="num">Stretch</th><th class="num">Picked</th><th></th></tr></thead>
+          <tbody id="hist-body"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="hist-empty">No saved quotes yet.</div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-settings" hidden>
+    <div class="set-layout">
+      <nav class="set-nav" id="set-nav" aria-label="Settings sections"></nav>
+      <div class="card set-panel" id="set-panel"></div>
+    </div>
+    <div class="savebar" id="savebar" role="status" aria-live="polite"><span class="dot"></span><span id="save-text">All changes saved</span></div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var money = function (n) { return isFinite(n) ? "$" + Math.round(n).toLocaleString("en-US") : "-"; };
+  var esc = function (s) { var d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; };
+
+  var db = null, settings = null, quotes = [], savePending = false;
+
+  // ---- Quote state (what the dials are set to) ----
+  function blankQuote() {
+    return { client: "", project: "", services: {}, risks: {}, timeline: null, rel: {}, valueSale: "", valueCount: "", budget: "", picked: null, pickTouched: false, notes: "" };
+  }
+  var q = blankQuote();
+
+  // ---- Pricing ----
+  function compute() {
+    if (!settings) return null;
+    var S = settings, lines = [], pass = [], subtotal = 0, active = [];
+    S.services.forEach(function (svc) {
+      var st = q.services[svc.id];
+      if (!st || !st.on) return;
+      active.push(svc.label);
+      var lvl = S.complexity[st.complexity] || S.complexity[0] || { mult: 1, label: "" };
+      var stack = S.stacks.filter(function (k) { return k.id === st.stack; })[0];
+      var stackMult = stack ? Number(stack.mult) || 1 : 1;
+      var base = (Number(svc.base) || 0) * (Number(lvl.mult) || 1) * stackMult;
+      var feats = 0;
+      svc.features.forEach(function (f) { if (st.features && st.features[f.id]) feats += Number(f.price) || 0; });
+      var line = base + feats;
+      subtotal += line;
+      lines.push({ label: svc.label + " · " + lvl.label + (stack ? " · " + stack.label : ""), amt: line });
+      if (stack && stack.pass) stack.pass.forEach(function (p) { pass.push({ label: stack.label + ": " + p.label, amt: p.amt, per: p.per }); });
+    });
+    var riskPct = 0;
+    S.risks.forEach(function (r) { if (q.risks[r.id]) { riskPct += Number(r.pct) || 0; } });
+    var risk = subtotal * riskPct / 100;
+    var tl = S.timeline.filter(function (t) { return t.id === q.timeline; })[0] || S.timeline[0];
+    var rushPct = tl ? Number(tl.pct) || 0 : 0;
+    var rush = (subtotal + risk) * rushPct / 100;
+    var relPct = 0;
+    S.relationship.forEach(function (r) { if (q.rel[r.id]) relPct += Number(r.pct) || 0; });
+    relPct = Math.min(relPct, Number(S.relationshipCap) || relPct);
+    var rel = (subtotal + risk + rush) * relPct / 100;
+    var round = Math.max(1, Number(S.round) || 50);
+    var floor = Math.round((subtotal + risk + rush - rel) / round) * round;
+
+    var sale = Number(q.valueSale) || 0, count = Number(q.valueCount) || 0;
+    var firstYear = sale * count;
+    var valuePrice = firstYear * (Number(S.paybackPct) || 0) / 100;
+    var valueRounded = Math.round(valuePrice / round) * round;
+    var stretch = Math.max(floor, valueRounded);
+
+    return { lines: lines, subtotal: subtotal, riskPct: riskPct, risk: risk, tl: tl, rushPct: rushPct, rush: rush, relPct: relPct, rel: rel, floor: floor, stretch: stretch, firstYear: firstYear, valuePrice: valueRounded, pass: pass, active: active, round: round };
+  }
+
+  // ---- Render: quote inputs ----
+  function renderQuoteInputs() {
+    var S = settings;
+    $("svc-toggles").innerHTML = S.services.map(function (svc) {
+      var on = q.services[svc.id] && q.services[svc.id].on;
+      return '<label class="svc-toggle"><input type="checkbox" data-svc="' + esc(svc.id) + '"' + (on ? " checked" : "") + '>' + esc(svc.label) + "</label>";
+    }).join("");
+    $("svc-details").innerHTML = S.services.map(function (svc) {
+      var st = q.services[svc.id];
+      if (!st || !st.on) return "";
+      var stacks = S.stacks.filter(function (k) { return !k.services || k.services.indexOf(svc.id) >= 0; });
+      var max = S.complexity.length - 1;
+      return '<div class="svc" data-svcbox="' + esc(svc.id) + '">' +
+        '<div class="svc-head"><h3>' + esc(svc.label) + '</h3><span class="amt" data-svcamt="' + esc(svc.id) + '"></span></div>' +
+        '<div class="f">Complexity<div class="levels" role="group" aria-label="Complexity">' +
+        S.complexity.map(function (c, i) { return '<button type="button" data-cxbtn="' + esc(svc.id) + "|" + i + '" aria-pressed="' + (i === st.complexity) + '">' + esc(c.label) + "<small>×" + esc(c.mult) + "</small></button>"; }).join("") +
+        "</div></div>" +
+        (stacks.length ? '<label class="f">Tech stack<select data-stack="' + esc(svc.id) + '">' + stacks.map(function (k) { return '<option value="' + esc(k.id) + '"' + (k.id === st.stack ? " selected" : "") + ">" + esc(k.label) + " (×" + esc(k.mult) + ")</option>"; }).join("") + "</select></label>" : "") +
+        (svc.features.length ? '<div class="checks">' + svc.features.map(function (f) {
+          var on = st.features && st.features[f.id];
+          return '<label class="check"><input type="checkbox" data-feat="' + esc(svc.id) + "|" + esc(f.id) + '"' + (on ? " checked" : "") + ">" + esc(f.label) + '<span class="p">+' + money(f.price) + "</span></label>";
+        }).join("") + "</div>" : "") +
+        "</div>";
+    }).join("");
+    $("risk-checks").innerHTML = S.risks.map(function (r) {
+      return '<label class="check"><input type="checkbox" data-risk="' + esc(r.id) + '"' + (q.risks[r.id] ? " checked" : "") + ">" + esc(r.label) + '<span class="p">+' + esc(r.pct) + "%</span></label>";
+    }).join("");
+    if (!q.timeline && S.timeline[0]) q.timeline = S.timeline[0].id;
+    $("timeline-seg").innerHTML = S.timeline.map(function (t) {
+      return '<button type="button" data-tl="' + esc(t.id) + '" aria-pressed="' + (t.id === q.timeline) + '">' + esc(t.label) + (Number(t.pct) ? " +" + esc(t.pct) + "%" : "") + "</button>";
+    }).join("");
+    $("rel-checks").innerHTML = S.relationship.map(function (r) {
+      return '<label class="check"><input type="checkbox" data-rel="' + esc(r.id) + '"' + (q.rel[r.id] ? " checked" : "") + ">" + esc(r.label) + '<span class="p">-' + esc(r.pct) + "%</span></label>";
+    }).join("");
+    $("q-client").value = q.client; $("q-project").value = q.project;
+    $("v-sale").value = q.valueSale; $("v-count").value = q.valueCount; $("b-budget").value = q.budget;
+    $("q-notes").value = q.notes;
+    $("v-note").textContent = "The value price is " + (Number(S.paybackPct) || 0) + "% of the client's first-year value (change it in Settings).";
+  }
+
+  // ---- Render: results ----
+  function renderResult() {
+    var r = compute();
+    if (!r) return;
+    settings.services.forEach(function (svc) {
+      var el = document.querySelector('[data-svcamt="' + svc.id + '"]');
+      if (!el) return;
+      var line = r.lines.filter(function (l) { return l.label.indexOf(svc.label + " ·") === 0; })[0];
+      el.textContent = line ? money(line.amt) : "";
+    });
+    var none = !r.active.length;
+    $("r-floor").textContent = none ? "-" : money(r.floor);
+    $("r-stretch").textContent = none ? "-" : money(r.stretch);
+    var L = r.lines.map(function (l) { return '<li><span>' + esc(l.label) + '</span><span>' + money(l.amt) + "</span></li>"; });
+    if (!none) {
+      L.push('<li class="sub"><span>Work</span><span>' + money(r.subtotal) + "</span></li>");
+      if (r.risk) L.push('<li class="pos"><span>Risk buffer +' + r.riskPct + "%</span><span>+" + money(r.risk) + "</span></li>");
+      if (r.rush) L.push('<li class="pos"><span>' + esc(r.tl.label) + " +" + r.rushPct + "%</span><span>+" + money(r.rush) + "</span></li>");
+      if (r.rel) L.push('<li class="neg"><span>Relationship -' + r.relPct + "%</span><span>-" + money(r.rel) + "</span></li>");
+      L.push('<li class="sub"><span>Floor (rounded to $' + r.round + ")</span><span>" + money(r.floor) + "</span></li>");
+    }
+    $("r-lines").innerHTML = none ? '<li class="muted">Turn on a service to start.</li>' : L.join("");
+
+    var vn = "";
+    if (r.firstYear > 0 && !none) {
+      vn = "First-year value " + money(r.firstYear) + ". Value price " + money(r.valuePrice) + " (" + settings.paybackPct + "%). The floor is " + (r.floor / r.firstYear * 100).toFixed(1) + "% of first-year value.";
+      if (r.valuePrice <= r.floor) vn += " The value price is under the floor, so the stretch stays at the floor.";
+    } else if (!none) vn = "Add value per sale and extra sales a year to see the value price.";
+    $("r-value").textContent = vn;
+
+    var b = Number(q.budget) || 0, flag = $("r-budget");
+    if (b > 0 && !none) {
+      var low = r.floor * (Number(settings.budgetLowPct) || 80) / 100;
+      var high = r.stretch * (Number(settings.budgetHighPct) || 120) / 100;
+      flag.hidden = false;
+      if (b < low) { flag.className = "flag low"; flag.textContent = "Budget " + money(b) + " is well below the floor. Suggest cutting scope rather than the price."; }
+      else if (b > high) { flag.className = "flag high"; flag.textContent = "Budget " + money(b) + " is well above the stretch. There's room for the fuller version."; }
+      else { flag.className = "flag ok"; flag.textContent = "Budget " + money(b) + " is in range."; }
+    } else flag.hidden = true;
+
+    $("pass-card").hidden = !r.pass.length;
+    $("r-pass").innerHTML = r.pass.map(function (p) { return "<li><span>" + esc(p.label) + "</span><span>" + money(p.amt) + (p.per ? " / " + esc(p.per) : "") + "</span></li>"; }).join("");
+
+    // pick
+    lastResult = r;
+    var onQuote = !$("tab-quote").hidden;
+    $("pricebar").hidden = none || !onQuote;
+    document.body.classList.toggle("has-bar", !none && onQuote);
+    if (none) { $("p-val").textContent = "-"; $("p-split").textContent = ""; $("p-where").textContent = ""; return; }
+    if (q.picked == null || !q.pickTouched) q.picked = r.floor; // follow the floor until you pick
+    var sl = $("p-slider");
+    sl.min = r.floor; sl.max = Math.max(r.stretch, r.floor + r.round); sl.step = r.round;
+    sl.disabled = r.stretch <= r.floor;
+    $("p-min").textContent = "Floor " + money(r.floor);
+    $("p-max").textContent = r.stretch > r.floor ? "Stretch " + money(r.stretch) : "Add value details to open a range";
+    updatePick();
+  }
+
+  // Updates only the price picker, so dragging stays smooth.
+  var lastResult = null;
+  function updatePick() {
+    var r = lastResult; if (!r || !r.active.length) return;
+    var sl = $("p-slider"), span = r.stretch - r.floor;
+    var clamped = Math.min(Math.max(q.picked, r.floor), Math.max(r.stretch, r.floor));
+    if (document.activeElement !== sl) sl.value = clamped;
+    var pct = span > 0 ? (clamped - r.floor) / span * 100 : 0;
+    sl.style.setProperty("--pct", pct + "%");
+    $("p-val").textContent = money(q.picked);
+    if (document.activeElement !== $("p-input")) $("p-input").value = Math.round(q.picked);
+    var where = q.picked < r.floor ? "Below your floor" : q.picked > r.stretch ? "Above your stretch" : span <= 0 ? "At the floor" : Math.round(pct) + "% of the way from floor to stretch";
+    if (r.firstYear > 0) where += " · " + (q.picked / r.firstYear * 100).toFixed(1) + "% of first-year value";
+    $("p-where").textContent = where;
+    document.querySelectorAll("#p-chips button").forEach(function (b) {
+      var target = Math.round((r.floor + span * Number(b.dataset.pickpct) / 100) / r.round) * r.round;
+      b.disabled = span <= 0 && b.dataset.pickpct !== "0";
+      b.setAttribute("aria-pressed", String(q.picked === target));
+    });
+    $("p-split").textContent = "50% up front " + money(q.picked / 2) + ", 50% on delivery " + money(q.picked / 2) + ".";
+    $("pb-val").textContent = money(q.picked);
+    $("pb-range").innerHTML = "Floor " + money(r.floor) + "<br>Stretch " + money(r.stretch);
+  }
+  $("pb-go").addEventListener("click", function () { document.querySelector(".pick").scrollIntoView({ behavior: "smooth", block: "center" }); });
+
+  function render() { renderQuoteInputs(); renderResult(); }
+
+  // ---- Events ----
+  document.addEventListener("change", function (e) {
+    var t = e.target, d = t.dataset;
+    if (!settings) return;
+    if (d.svc) {
+      var cur = q.services[d.svc] || { on: false, complexity: 1, stack: null, features: {} };
+      cur.on = t.checked;
+      if (!cur.stack) { var first = settings.stacks.filter(function (k) { return !k.services || k.services.indexOf(d.svc) >= 0; })[0]; cur.stack = first ? first.id : null; }
+      cur.complexity = Math.min(cur.complexity, settings.complexity.length - 1);
+      q.services[d.svc] = cur; q.picked = null; render(); return;
+    }
+    if (d.stack) { q.services[d.stack].stack = t.value; renderResult(); return; }
+    if (d.feat) { var p = d.feat.split("|"); q.services[p[0]].features[p[1]] = t.checked; renderResult(); return; }
+    if (d.risk) { q.risks[d.risk] = t.checked; renderResult(); return; }
+    if (d.rel) { q.rel[d.rel] = t.checked; renderResult(); return; }
+  });
+  document.addEventListener("input", function (e) {
+    var t = e.target, d = t.dataset;
+    if (!settings) return;
+    if (t.id === "q-client") q.client = t.value;
+    else if (t.id === "q-project") q.project = t.value;
+    else if (t.id === "v-sale") { q.valueSale = t.value; renderResult(); }
+    else if (t.id === "v-count") { q.valueCount = t.value; renderResult(); }
+    else if (t.id === "b-budget") { q.budget = t.value; renderResult(); }
+    else if (t.id === "q-notes") q.notes = t.value;
+    else if (t.id === "p-slider") { q.picked = Number(t.value); q.pickTouched = true; updatePick(); }
+    else if (t.id === "p-input") { q.picked = Number(t.value) || 0; q.pickTouched = true; updatePick(); }
+  });
+  document.addEventListener("click", function (e) {
+    var cx = e.target.closest("[data-cxbtn]");
+    if (cx) {
+      var p = cx.dataset.cxbtn.split("|");
+      q.services[p[0]].complexity = Number(p[1]);
+      cx.parentNode.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b === cx)); });
+      renderResult(); return;
+    }
+    var chip = e.target.closest("[data-pickpct]");
+    if (chip && lastResult) {
+      var r = lastResult;
+      q.picked = Math.round((r.floor + (r.stretch - r.floor) * Number(chip.dataset.pickpct) / 100) / r.round) * r.round;
+      q.pickTouched = true; $("p-slider").blur(); updatePick();
+    }
+  });
+  $("timeline-seg").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-tl]"); if (!b) return;
+    q.timeline = b.dataset.tl; render();
+  });
+  document.querySelectorAll(".tabs button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll(".tabs button").forEach(function (x) { x.setAttribute("aria-selected", x === b); });
+      ["quote", "history", "settings"].forEach(function (n) { $("tab-" + n).hidden = n !== b.dataset.tab; });
+      if (b.dataset.tab === "settings") renderPanel();
+      if (settings) renderResult(); // shows or hides the phone price bar
+    });
+  });
+  $("new-quote").addEventListener("click", function () { q = blankQuote(); render(); $("save-status").textContent = ""; });
+
+  // ---- Save quote ----
+  $("save-quote").addEventListener("click", async function () {
+    var r = compute();
+    if (!r || !r.active.length) { $("save-status").textContent = "Turn on at least one service first."; return; }
+    if (!db) { $("save-status").textContent = "Saving isn't available in this view."; return; }
+    var btn = this; btn.disabled = true; $("save-status").textContent = "Saving...";
+    try {
+      await db.collection("quotes").add({
+        createdAt: new Date().toISOString(),
+        client: q.client.trim() || "Untitled", project: q.project.trim(), notes: q.notes,
+        services: r.active, inputs: JSON.parse(JSON.stringify(q)),
+        floor: r.floor, stretch: r.stretch, picked: Math.round(q.picked || r.floor),
+        firstYearValue: r.firstYear, valuePrice: r.valuePrice, budget: Number(q.budget) || null,
+        exampleSettings: !!settings.example,
+      });
+      $("save-status").textContent = "Saved to History.";
+    } catch (err) {
+      $("save-status").textContent = err && err.code === "quota_exceeded" ? "Storage is full. Delete some old quotes in History." : "Couldn't save. Try again.";
+    }
+    btn.disabled = false;
+  });
+
+  // ---- History ----
+  function renderHistory() {
+    $("hist-empty").hidden = quotes.length > 0;
+    $("hist-body").innerHTML = quotes.map(function (doc) {
+      var d = doc.data;
+      return "<tr><td>" + esc(new Date(d.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })) + "</td><td>" + esc(d.client) + (d.exampleSettings ? ' <span class="badge">Example</span>' : "") + "</td><td>" + esc(d.project) + "</td><td>" + esc((d.services || []).join(", ")) +
+        '</td><td class="num">' + money(d.floor) + '</td><td class="num">' + money(d.stretch) + '</td><td class="num"><b>' + money(d.picked) + '</b></td><td style="white-space:nowrap"><button class="btn ghost small" data-load="' + esc(doc.id) + '">Open</button> <button class="btn ghost small" data-del="' + esc(doc.id) + '">Delete</button></td></tr>';
+    }).join("");
+  }
+  $("hist-body").addEventListener("click", async function (e) {
+    var load = e.target.closest("[data-load]"), del = e.target.closest("[data-del]");
+    if (load) {
+      var doc = quotes.filter(function (x) { return x.id === load.dataset.load; })[0];
+      if (!doc) return;
+      q = Object.assign(blankQuote(), JSON.parse(JSON.stringify(doc.data.inputs || {})));
+      q.picked = doc.data.picked; q.pickTouched = true;
+      document.querySelector('.tabs button[data-tab="quote"]').click();
+      render(); $("save-status").textContent = "Loaded. Saving again creates a new entry.";
+    }
+    if (del) {
+      if (del.dataset.confirm !== "1") { del.dataset.confirm = "1"; del.textContent = "Confirm delete"; return; }
+      try { await db.doc("quotes/" + del.dataset.del).delete(); } catch (err) { del.textContent = "Couldn't delete"; }
+    }
+  });
+
+  // ---- Settings editor ----
+  // One section at a time, every change saves itself a moment after you stop typing.
+  var SECTIONS = [
+    { id: "services", label: "Services", note: function () { return settings.services.length; } },
+    { id: "complexity", label: "Complexity", note: function () { return settings.complexity.length + " levels"; } },
+    { id: "stacks", label: "Tech stacks", note: function () { return settings.stacks.length; } },
+    { id: "risks", label: "Risk", note: function () { return settings.risks.length; } },
+    { id: "timeline", label: "Timeline", note: function () { return settings.timeline.length; } },
+    { id: "relationship", label: "Relationship", note: function () { return "max " + settings.relationshipCap + "%"; } },
+    { id: "value", label: "Value and rounding", note: function () { return settings.paybackPct + "%"; } },
+  ];
+  var ui = { section: "services", service: null, stackFilter: "all", confirm: null };
+  var saveTimer = null;
+
+  function num(v) { var n = Number(v); return isFinite(n) ? n : 0; }
+  function uid(p) { return p + Math.random().toString(36).slice(2, 8); }
+  // An input with a $ / % / × marker. `path` is where the value lives in settings.
+  function field(path, value, kind, attrs) {
+    var pre = kind === "money" ? "$" : kind === "mult" ? "×" : "", post = kind === "pct" ? "%" : "";
+    var type = kind === "text" ? "text" : "number";
+    var extra = type === "number" ? ' inputmode="decimal" step="any" min="0"' : "";
+    return '<div class="inp">' + (pre ? "<span>" + pre + "</span>" : "") +
+      '<input type="' + type + '" data-path="' + esc(path) + '" data-kind="' + kind + '" value="' + esc(value) + '"' + extra + (attrs || "") + ">" +
+      (post ? '<span class="after">' + post + "</span>" : "") + "</div>";
+  }
+  function delBtn(key, label) {
+    var on = ui.confirm === key;
+    return '<button type="button" class="icon-btn' + (on ? " confirm" : "") + '" data-del="' + esc(key) + '" aria-label="' + esc(label) + '">' + (on ? "Remove?" : "&times;") + "</button>";
+  }
+
+  function renderNav() {
+    $("set-nav").innerHTML = SECTIONS.map(function (s) {
+      return '<button type="button" data-sec="' + s.id + '" aria-current="' + (ui.section === s.id) + '">' + esc(s.label) + "<small>" + esc(s.note()) + "</small></button>";
+    }).join("");
+  }
+
+  var PANELS = {
+    services: function () {
+      var S = settings;
+      if (!ui.service || !S.services.some(function (x) { return x.id === ui.service; })) ui.service = S.services[0].id;
+      var i = S.services.findIndex(function (x) { return x.id === ui.service; }), svc = S.services[i];
+      return '<header><h2>Services</h2><p>The starting price for each service, then what each optional feature adds on top.</p></header>' +
+        '<div class="pills">' + S.services.map(function (x) { return '<button type="button" data-svcpick="' + esc(x.id) + '" aria-pressed="' + (x.id === ui.service) + '">' + esc(x.label) + "</button>"; }).join("") + "</div>" +
+        '<div class="base-row"><div class="fld"><label>Name</label>' + field("services." + i + ".label", svc.label, "text") + '</div><div class="fld"><label>Starting price</label>' + field("services." + i + ".base", svc.base, "money") + "</div></div>" +
+        '<div class="rows"><div class="rowhead"><span>Feature</span><span>Adds</span><span></span></div>' +
+        svc.features.map(function (f, j) {
+          return '<div class="erow">' + field("services." + i + ".features." + j + ".label", f.label, "text", ' aria-label="Feature name"') + field("services." + i + ".features." + j + ".price", f.price, "money", ' aria-label="Feature price"') + delBtn("feat|" + i + "|" + j, "Remove " + f.label) + "</div>";
+        }).join("") + "</div>" +
+        '<button type="button" class="add" data-add="feat|' + i + '">+ Add a feature</button>';
+    },
+    complexity: function () {
+      var svc = settings.services[0];
+      return '<header><h2>Complexity</h2><p>Multiplies a service\'s starting price. The example on the right uses your ' + esc(svc.label.toLowerCase()) + ' price.</p></header>' +
+        '<div class="rows"><div class="rowhead" style="grid-template-columns:minmax(0,1fr) 8rem minmax(0,10rem)"><span>Level</span><span>Multiplier</span><span>Example</span></div>' +
+        settings.complexity.map(function (c, i) {
+          return '<div class="erow cx">' + field("complexity." + i + ".label", c.label, "text", ' aria-label="Level name"') + field("complexity." + i + ".mult", c.mult, "mult", ' aria-label="Multiplier"') +
+            '<span class="eg" data-eg="' + i + '">' + money(num(svc.base) * num(c.mult)) + "</span></div>";
+        }).join("") + "</div>";
+    },
+    stacks: function () {
+      var S = settings, f = ui.stackFilter;
+      var list = S.stacks.map(function (k, i) { return { k: k, i: i }; }).filter(function (x) { return f === "all" || !x.k.services || x.k.services.indexOf(f) >= 0; });
+      return '<header><h2>Tech stacks</h2><p>The effort multiplier changes your fee. Pass-through costs are subscriptions and fees the client pays directly, shown separately.</p></header>' +
+        '<div class="pills"><button type="button" data-stackf="all" aria-pressed="' + (f === "all") + '">All</button>' + S.services.map(function (x) { return '<button type="button" data-stackf="' + esc(x.id) + '" aria-pressed="' + (f === x.id) + '">' + esc(x.label) + "</button>"; }).join("") + "</div>" +
+        list.map(function (x) {
+          var k = x.k, i = x.i;
+          return '<div class="stackcard">' +
+            '<div class="top-row"><div class="fld"><label>Stack</label>' + field("stacks." + i + ".label", k.label, "text") + '</div><div class="fld"><label>Effort</label>' + field("stacks." + i + ".mult", k.mult, "mult") + "</div>" + delBtn("stack|" + i, "Remove " + k.label) + "</div>" +
+            '<div class="fld"><span class="lbl">Used for</span><div class="chipset">' + S.services.map(function (svc) {
+              var on = !k.services || k.services.indexOf(svc.id) >= 0;
+              return '<button type="button" data-stacksvc="' + i + "|" + esc(svc.id) + '" aria-pressed="' + on + '">' + esc(svc.label) + "</button>";
+            }).join("") + "</div></div>" +
+            '<div class="fld"><span class="lbl">Pass-through costs</span><div class="rows">' + (k.pass || []).map(function (p, j) {
+              return '<div class="erow pass">' + field("stacks." + i + ".pass." + j + ".label", p.label, "text", ' aria-label="Cost name"') + field("stacks." + i + ".pass." + j + ".amt", p.amt, "money", ' aria-label="Amount"') +
+                '<div class="inp"><select data-path="stacks.' + i + ".pass." + j + '.per" data-kind="text" aria-label="How often">' + ["mo", "yr", "one-time"].map(function (o) { return "<option" + (o === p.per ? " selected" : "") + ">" + o + "</option>"; }).join("") + "</select></div>" +
+                delBtn("pass|" + i + "|" + j, "Remove " + p.label) + "</div>";
+            }).join("") + '</div><button type="button" class="add" data-add="pass|' + i + '">+ Add a cost</button></div>' +
+            "</div>";
+        }).join("") +
+        '<button type="button" class="add" data-add="stack">+ Add a stack</button>';
+    },
+    risks: function () { return pctList("risks", "Risk", "Each risk you tick on a quote adds this buffer on top of the work."); },
+    timeline: function () { return pctList("timeline", "Timeline", "The first option is your standard timeline. The others add a premium."); },
+    relationship: function () {
+      return pctList("relationship", "Relationship", "Discounts for returning clients or real future work, shown as their own line on the quote.") +
+        '<div class="fld" style="max-width:16rem"><label>Never discount more than</label>' + field("relationshipCap", settings.relationshipCap, "pct") + "</div>";
+    },
+    value: function () {
+      var S = settings;
+      return '<header><h2>Value and rounding</h2><p>How the value price and budget check work, and how prices round.</p></header>' +
+        '<div class="row">' +
+        '<div class="fld"><label>Value price target</label>' + field("paybackPct", S.paybackPct, "pct") + '<span class="help">Share of the client\'s first-year value. 10% of $500K = $50K.</span></div>' +
+        '<div class="fld"><label>Round prices to the nearest</label>' + field("round", S.round, "money") + '<span class="help">Also the slider\'s step.</span></div>' +
+        '<div class="fld"><label>Budget is "well below" under</label>' + field("budgetLowPct", S.budgetLowPct, "pct") + '<span class="help">Of the floor.</span></div>' +
+        '<div class="fld"><label>Budget is "well above" over</label>' + field("budgetHighPct", S.budgetHighPct, "pct") + '<span class="help">Of the stretch.</span></div>' +
+        "</div>";
+    },
+  };
+  function pctList(key, title, note) {
+    return "<header><h2>" + esc(title) + "</h2><p>" + esc(note) + "</p></header>" +
+      '<div class="rows"><div class="rowhead" style="grid-template-columns:minmax(0,1fr) 9rem"><span>Name</span><span>Percent</span></div>' +
+      settings[key].map(function (r, i) {
+        return '<div class="erow" style="grid-template-columns:minmax(0,1fr) 9rem">' + field(key + "." + i + ".label", r.label, "text", ' aria-label="Name"') + field(key + "." + i + ".pct", r.pct, "pct", ' aria-label="Percent"') + "</div>";
+      }).join("") + "</div>";
+  }
+
+  function renderPanel(focusPath) {
+    if (!settings) return;
+    renderNav();
+    $("set-panel").innerHTML = PANELS[ui.section]();
+    if (focusPath) { var el = $("set-panel").querySelector('[data-path="' + focusPath + '"]'); if (el) { el.focus(); el.select && el.select(); } }
+  }
+
+  function setPath(path, raw, kind) {
+    var parts = path.split("."), o = settings;
+    for (var i = 0; i < parts.length - 1; i++) o = o[/^\d+$/.test(parts[i]) ? Number(parts[i]) : parts[i]];
+    var last = parts[parts.length - 1];
+    o[last] = kind === "text" ? raw : num(raw);
+    if (path === "round") settings.round = Math.max(1, settings.round);
+  }
+
+  // Autosave: one write per pause, never while another is in flight.
+  function setSave(state, text) { var b = $("savebar"); b.className = "savebar " + state; $("save-text").textContent = text; }
+  function scheduleSave() {
+    savePending = true; setSave("saving", "Saving...");
+    clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 700);
+  }
+  var saving = false;
+  async function saveNow() {
+    if (!db) { setSave("error", "Can't save in this view"); return; }
+    if (saving) { saveTimer = setTimeout(saveNow, 300); return; }
+    saving = true;
+    try {
+      var body = JSON.parse(JSON.stringify(settings));
+      body.example = false; body.updatedAt = new Date().toISOString();
+      settings.example = false;
+      await db.doc("config/settings").set(body);
+      savePending = false;
+      $("example-badge").hidden = true; setNotice("");
+      setSave("", "All changes saved");
+    } catch (err) { setSave("error", "Couldn't save. Will retry on your next change."); }
+    saving = false;
+  }
+
+  $("tab-settings").addEventListener("input", function (e) {
+    var t = e.target; if (!t.dataset.path) return;
+    setPath(t.dataset.path, t.value, t.dataset.kind);
+    // live bits that don't need a full redraw
+    if (ui.section === "complexity") document.querySelectorAll("[data-eg]").forEach(function (el) { el.textContent = money(num(settings.services[0].base) * num(settings.complexity[Number(el.dataset.eg)].mult)); });
+    renderNav();
+    scheduleSave();
+  });
+  $("tab-settings").addEventListener("change", function (e) { if (e.target.tagName === "SELECT" && e.target.dataset.path) { setPath(e.target.dataset.path, e.target.value, "text"); scheduleSave(); } });
+  $("tab-settings").addEventListener("click", function (e) {
+    var t = e.target.closest("button"); if (!t) return;
+    var d = t.dataset, S = settings;
+    if (d.sec) { ui.section = d.sec; ui.confirm = null; renderPanel(); return; }
+    if (d.svcpick) { ui.service = d.svcpick; ui.confirm = null; renderPanel(); return; }
+    if (d.stackf) { ui.stackFilter = d.stackf; ui.confirm = null; renderPanel(); return; }
+    if (d.stacksvc) {
+      var p = d.stacksvc.split("|"), k = S.stacks[Number(p[0])];
+      var cur = k.services ? k.services.slice() : S.services.map(function (x) { return x.id; });
+      var at = cur.indexOf(p[1]); if (at >= 0) cur.splice(at, 1); else cur.push(p[1]);
+      k.services = cur; renderPanel(); scheduleSave(); return;
+    }
+    if (d.add) {
+      var a = d.add.split("|"), focus = null;
+      if (a[0] === "feat") { var sv = S.services[Number(a[1])]; sv.features.push({ id: uid("f"), label: "", price: 0 }); focus = "services." + a[1] + ".features." + (sv.features.length - 1) + ".label"; }
+      if (a[0] === "pass") { var st = S.stacks[Number(a[1])]; (st.pass = st.pass || []).push({ label: "", amt: 0, per: "mo" }); focus = "stacks." + a[1] + ".pass." + (st.pass.length - 1) + ".label"; }
+      if (a[0] === "stack") { S.stacks.push({ id: uid("s"), label: "", mult: 1, services: ui.stackFilter === "all" ? null : [ui.stackFilter], pass: [] }); focus = "stacks." + (S.stacks.length - 1) + ".label"; }
+      ui.confirm = null; renderPanel(focus); scheduleSave(); return;
+    }
+    if (d.del) {
+      if (ui.confirm !== d.del) { ui.confirm = d.del; renderPanel(); return; }
+      var r = d.del.split("|");
+      if (r[0] === "feat") S.services[Number(r[1])].features.splice(Number(r[2]), 1);
+      if (r[0] === "pass") S.stacks[Number(r[1])].pass.splice(Number(r[2]), 1);
+      if (r[0] === "stack") S.stacks.splice(Number(r[1]), 1);
+      ui.confirm = null; renderPanel(); scheduleSave(); return;
+    }
+  });
+  // A tap anywhere else cancels a pending "Remove?"
+  document.addEventListener("click", function (e) { if (ui.confirm && !e.target.closest("[data-del]")) { ui.confirm = null; if (!$("tab-settings").hidden) renderPanel(); } }, true);
+  // Leaving the page with an unsaved change: save it now.
+  addEventListener("pagehide", function () { if (savePending) { clearTimeout(saveTimer); saveNow(); } });
+
+  // ---- Demo mode (static copy): invented example numbers, quotes kept in this browser ----
+  var demo = false;
+  var DEMO_NOTE = "<b>Demo with example numbers.</b> The prices are made up. Quotes you save stay in this browser.";
+  var EXAMPLE_SETTINGS = {
+    example: true,
+    services: [
+      { id: "website", label: "Website", base: 6000, features: [
+        { id: "cms", label: "Blog or CMS", price: 1200 },
+        { id: "forms", label: "Booking or contact forms", price: 600 },
+        { id: "store", label: "Online store", price: 3500 },
+        { id: "copy", label: "Copywriting", price: 1500 },
+        { id: "seo", label: "SEO setup", price: 800 } ] },
+      { id: "brand", label: "Brand identity", base: 3500, features: [
+        { id: "guide", label: "Brand guidelines", price: 900 },
+        { id: "social", label: "Social templates", price: 600 } ] },
+      { id: "app", label: "Web app", base: 15000, features: [
+        { id: "accounts", label: "User accounts", price: 2500 },
+        { id: "payments", label: "Payments", price: 2000 },
+        { id: "admin", label: "Admin dashboard", price: 3000 } ] }
+    ],
+    complexity: [ { label: "Simple", mult: 0.8 }, { label: "Standard", mult: 1 }, { label: "Involved", mult: 1.4 }, { label: "Complex", mult: 2 } ],
+    stacks: [
+      { id: "builder", label: "Site builder", mult: 1, services: ["website"], pass: [ { label: "Site plan", amt: 30, per: "mo" } ] },
+      { id: "custom", label: "Custom code", mult: 1.3, services: ["website", "app"], pass: [ { label: "Hosting", amt: 20, per: "mo" } ] },
+      { id: "nocode", label: "No-code app builder", mult: 0.9, services: ["app"], pass: [ { label: "App builder plan", amt: 70, per: "mo" } ] }
+    ],
+    risks: [
+      { id: "new", label: "New client, no track record", pct: 10 },
+      { id: "content", label: "Content not ready", pct: 10 },
+      { id: "scope", label: "Scope still unclear", pct: 15 },
+      { id: "integrations", label: "Third-party integrations", pct: 10 }
+    ],
+    timeline: [ { id: "standard", label: "Standard", pct: 0 }, { id: "faster", label: "Faster", pct: 15 }, { id: "rush", label: "Rush", pct: 30 } ],
+    relationship: [ { id: "returning", label: "Returning client", pct: 5 }, { id: "followon", label: "Clear follow-on work", pct: 5 } ],
+    relationshipCap: 10, paybackPct: 10, round: 50, budgetLowPct: 80, budgetHighPct: 120
+  };
+  // Same calls as the claude.ai database, backed by localStorage (or memory if that's blocked).
+  function localDb() {
+    var KEY = "graphyte-pricing-demo", mem = null, quoteSubs = [];
+    function load() {
+      if (mem) return mem;
+      try { mem = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
+      if (!mem || typeof mem !== "object") mem = {};
+      if (!mem.quotes) mem.quotes = {};
+      return mem;
+    }
+    function persist() { try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch (e) {} }
+    function settingsSnap() { var s = load().settings || EXAMPLE_SETTINGS; return { exists: true, data: function () { return s; } }; }
+    function quotesSnap() {
+      var all = load().quotes;
+      var docs = Object.keys(all).map(function (id) { return { id: id, data: function () { return all[id]; } }; });
+      docs.sort(function (a, b) { return a.data().createdAt < b.data().createdAt ? 1 : -1; });
+      return { docs: docs };
+    }
+    function emitQuotes() { quoteSubs.forEach(function (cb) { cb(quotesSnap()); }); }
+    var quotesRef = {
+      add: function (obj) { var id = "q" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); load().quotes[id] = JSON.parse(JSON.stringify(obj)); persist(); emitQuotes(); return Promise.resolve({ id: id }); },
+      orderBy: function () { return quotesRef; },
+      limit: function () { return quotesRef; },
+      onSnapshot: function (cb) { quoteSubs.push(cb); cb(quotesSnap()); return function () {}; }
+    };
+    return {
+      doc: function (path) {
+        if (path === "config/settings") return {
+          onSnapshot: function (cb) { cb(settingsSnap()); return function () {}; },
+          set: function (body) { load().settings = JSON.parse(JSON.stringify(body)); persist(); return Promise.resolve(); }
+        };
+        var id = path.split("/")[1];
+        return { delete: function () { delete load().quotes[id]; persist(); emitQuotes(); return Promise.resolve(); } };
+      },
+      collection: function () { return quotesRef; }
+    };
+  }
+
+  // ---- Boot ----
+  function setNotice(html) { if (!html && demo) html = DEMO_NOTE; var n = $("notice"); n.hidden = !html; n.innerHTML = html || ""; }
+  function applySettings(s) {
+    settings = s;
+    $("example-badge").hidden = !s.example;
+    setNotice(s.example && !demo ? "<b>These are example numbers</b>, not your prices. Change any of them in Settings and this label goes away." : "");
+    render();
+    if (!$("tab-settings").hidden) renderPanel();
+  }
+  setNotice("Loading your settings...");
+  var dbReady = window.claude && window.claude.use ? Promise.resolve(window.claude.use("db")).catch(function () { return null; }) : Promise.resolve(null);
+  dbReady.then(function (handle) {
+    db = handle;
+    if (!db) { demo = true; db = localDb(); }
+    db.doc("config/settings").onSnapshot(function (snap) {
+      if (!snap.exists) { applySettings(JSON.parse(JSON.stringify(EXAMPLE_SETTINGS))); return; }
+      if (savePending || (settings && $("tab-settings").contains(document.activeElement))) return; // don't clobber what you're typing
+      applySettings(JSON.parse(JSON.stringify(snap.data())));
+    }, function () { setNotice("Lost the connection to your saved settings. Reload the page."); });
+    db.collection("quotes").orderBy("createdAt", "desc").limit(200).onSnapshot(function (snap) {
+      quotes = snap.docs.map(function (d) { return { id: d.id, data: d.data() }; });
+      renderHistory();
+    }, function () {});
+  });
+})();
+</script>
+
+</body></html>

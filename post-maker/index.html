@@ -1,0 +1,411 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Graphyte Post Maker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: controls on the left, a live 1080×1350 preview on the right; stacks on phones. */
+:root {
+  --bg: #F7F6F4;
+  --surface: #FFFFFF;
+  --ink: #1A1817;
+  --muted: #6B6460;
+  --line: #E5E0DC;
+  --accent: #FF5521;
+  --accent-ink: #C23E17;
+  --field: #FBFAF9;
+  --display: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --body: "Manrope", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121110; --surface: #1B1917; --ink: #F2EEEA; --muted: #A69E99; --line: #332D2A;
+    --accent: #FF6A3D; --accent-ink: #FF8C66; --field: #161413;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121110; --surface: #1B1917; --ink: #F2EEEA; --muted: #A69E99; --line: #332D2A;
+  --accent: #FF6A3D; --accent-ink: #FF8C66; --field: #161413;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 24px; }
+header { display: grid; gap: 6px; }
+h1 { font-family: var(--display); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+header p { margin: 0; color: var(--muted); max-width: 70ch; }
+.app { display: grid; grid-template-columns: 360px 1fr; gap: 28px; align-items: start; }
+.controls { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: grid; gap: 18px; min-width: 0; }
+.field { display: grid; gap: 6px; }
+.label { font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--field); border: 1px solid var(--line); border-radius: 8px; padding: 4px; }
+.seg.two { grid-template-columns: repeat(2, 1fr); }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label { text-align: center; font-size: .875rem; font-weight: 600; padding: 7px 4px; border-radius: 6px; cursor: pointer; color: var(--muted); }
+.seg input:checked + label { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.seg input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 1px; }
+textarea, input[type="text"] { font: inherit; color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; width: 100%; }
+textarea { resize: vertical; min-height: 92px; }
+textarea:focus-visible, input:focus-visible, button:focus-visible, .drop:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.hint { font-size: .8125rem; color: var(--muted); }
+.drops { display: grid; gap: 10px; }
+.drop { border: 1.5px dashed var(--line); border-radius: 8px; padding: 12px; display: grid; grid-template-columns: 48px 1fr auto; gap: 10px; align-items: center; cursor: pointer; background: var(--field); }
+.drop.over { border-color: var(--accent); }
+.drop .thumb { width: 48px; height: 48px; border-radius: 4px; background: var(--line) center/cover no-repeat; }
+.drop .name { font-weight: 600; font-size: .875rem; }
+.drop .sub { font-size: .8125rem; color: var(--muted); }
+.drop .clear { border: 0; background: none; color: var(--muted); font: inherit; font-size: .8125rem; cursor: pointer; padding: 4px 6px; border-radius: 4px; }
+.drop .clear:hover { color: var(--ink); background: var(--surface); }
+.btn { font: inherit; font-weight: 700; font-size: .9375rem; border: 0; border-radius: 8px; padding: 12px 16px; background: var(--accent); color: #FFFFFF; cursor: pointer; width: 100%; }
+.btn:disabled { opacity: .5; cursor: default; }
+.status { font-size: .875rem; color: var(--muted); min-height: 1.3em; }
+.preview { display: grid; gap: 10px; justify-items: center; position: sticky; top: max(16px, env(safe-area-inset-top, 0px)); min-width: 0; }
+canvas { width: 100%; max-width: 540px; height: auto; aspect-ratio: 4 / 5; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 12px 32px -12px rgba(0,0,0,.18); background: var(--surface); }
+.preview .meta { font-size: .8125rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rules { font-size: .8125rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 4px; }
+@media (max-width: 820px) { .app { grid-template-columns: 1fr; } .preview { position: static; order: -1; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Graphyte Post Maker</h1>
+    <p>Pick a format, drop or paste a real screenshot, write one line and download a 1080×1350 image. That size works in the LinkedIn, Instagram and Facebook feeds.</p>
+  </header>
+
+  <div class="app">
+    <form class="controls" id="controls" autocomplete="off">
+      <div class="field">
+        <span class="label" id="fmt-label">Format</span>
+        <div class="seg" role="radiogroup" aria-labelledby="fmt-label">
+          <input type="radio" name="format" id="fmt-screen" value="screen" checked><label for="fmt-screen">Screen</label>
+          <input type="radio" name="format" id="fmt-ba" value="ba"><label for="fmt-ba">Before / after</label>
+          <input type="radio" name="format" id="fmt-photo" value="photo"><label for="fmt-photo">Photo</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="label">Images</span>
+        <div class="drops" id="drops"></div>
+        <span class="hint">Click a slot, drop a file on it, or copy a screenshot and paste with ⌘V.</span>
+        <input type="file" id="file" accept="image/*" hidden>
+      </div>
+
+      <div class="field">
+        <label class="label" for="eyebrow">Small label (optional)</label>
+        <input type="text" id="eyebrow" maxlength="60" placeholder="e.g. Bakery · New website">
+      </div>
+
+      <div class="field">
+        <label class="label" for="line">The line</label>
+        <textarea id="line" maxlength="180">Bread sells out by nine, and the old site still showed last winter's opening hours.</textarea>
+        <span class="hint" id="line-hint">One plain sentence or two. It wraps to 4 lines at most.</span>
+      </div>
+
+      <div class="field">
+        <span class="label" id="bg-label">Background</span>
+        <div class="seg two" role="radiogroup" aria-labelledby="bg-label">
+          <input type="radio" name="bg" id="bg-sand" value="sand" checked><label for="bg-sand">Sand</label>
+          <input type="radio" name="bg" id="bg-ink" value="ink"><label for="bg-ink">Ink</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="label" id="hex-label">Hexagon pattern</span>
+        <div class="seg" role="radiogroup" aria-labelledby="hex-label">
+          <input type="radio" name="hex" id="hex-tr" value="tr" checked><label for="hex-tr">Top right</label>
+          <input type="radio" name="hex" id="hex-br" value="br"><label for="hex-br">Bottom right</label>
+          <input type="radio" name="hex" id="hex-off" value="off"><label for="hex-off">Off</label>
+        </div>
+      </div>
+
+      <button class="btn" type="button" id="download">Download PNG</button>
+      <p class="status" id="status" role="status"></p>
+
+      <div class="rules">
+        <span>Real screens, real phones, real places. No 3D devices, no stock photos, no AI scenes.</span>
+      </div>
+    </form>
+
+    <div class="preview">
+      <canvas id="out" width="1080" height="1350" aria-label="Post preview"></canvas>
+      <span class="meta">1080 × 1350 · PNG</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const W = 1080, H = 1350, PAD = 72;
+const C = {
+  sand: "#F6EFE4", sandDeep: "#E4DAC5", ink: "#120502", ink2: "#1A1817", orange: "#FF5521", orange6: "#D44219",
+  muted: "#745F49", placeholder: "#EAE5E4", placeholderInk: "#777271", white: "#FFFFFF"
+};
+const SLOTS = {
+  screen: [{ key: "desktop", name: "Desktop screenshot", sub: "Required" }, { key: "phone", name: "Phone screenshot", sub: "Optional, overlaps the corner" }],
+  ba: [{ key: "before", name: "Before", sub: "Screenshot of the old version" }, { key: "after", name: "After", sub: "Screenshot of the fix" }],
+  photo: [{ key: "photo", name: "Photo", sub: "The site on their phone, in their place" }]
+};
+const images = {};
+let activeSlot = null;
+
+const canvas = document.getElementById("out");
+const ctx = canvas.getContext("2d");
+const dropsEl = document.getElementById("drops");
+const fileEl = document.getElementById("file");
+const statusEl = document.getElementById("status");
+
+const val = (name) => document.querySelector(`input[name="${name}"]:checked`).value;
+const state = () => ({
+  format: val("format"), bg: val("bg"), hex: val("hex"),
+  eyebrow: document.getElementById("eyebrow").value.trim(),
+  line: document.getElementById("line").value.trim()
+});
+
+/* ---------- slot UI ---------- */
+function buildDrops() {
+  const f = val("format");
+  dropsEl.replaceChildren();
+  for (const s of SLOTS[f]) {
+    const d = document.createElement("div");
+    d.className = "drop"; d.tabIndex = 0; d.dataset.key = s.key;
+    d.setAttribute("role", "button");
+    d.setAttribute("aria-label", "Add image: " + s.name);
+    const thumb = document.createElement("span"); thumb.className = "thumb";
+    if (images[s.key]) thumb.style.backgroundImage = `url(${images[s.key].src})`;
+    const txt = document.createElement("span");
+    const n = document.createElement("div"); n.className = "name"; n.textContent = s.name;
+    const sub = document.createElement("div"); sub.className = "sub"; sub.textContent = images[s.key] ? "Added · click to replace" : s.sub;
+    txt.append(n, sub);
+    d.append(thumb, txt);
+    if (images[s.key]) {
+      const x = document.createElement("button"); x.type = "button"; x.className = "clear"; x.textContent = "Remove";
+      x.addEventListener("click", (e) => { e.stopPropagation(); delete images[s.key]; buildDrops(); draw(); });
+      d.append(x);
+    } else d.append(document.createElement("span"));
+    d.addEventListener("click", () => { activeSlot = s.key; fileEl.value = ""; fileEl.click(); });
+    d.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); d.click(); } });
+    d.addEventListener("focus", () => { activeSlot = s.key; });
+    d.addEventListener("dragover", (e) => { e.preventDefault(); d.classList.add("over"); });
+    d.addEventListener("dragleave", () => d.classList.remove("over"));
+    d.addEventListener("drop", (e) => {
+      e.preventDefault(); d.classList.remove("over");
+      const file = [...(e.dataTransfer.files || [])].find(f => f.type.startsWith("image/"));
+      if (file) loadFile(file, s.key);
+    });
+    dropsEl.append(d);
+  }
+}
+
+function loadFile(file, key) {
+  const r = new FileReader();
+  r.onload = () => {
+    const img = new Image();
+    img.onload = () => { images[key] = img; buildDrops(); draw(); setStatus(""); };
+    img.onerror = () => setStatus("That file couldn't be read as an image.");
+    img.src = r.result;
+  };
+  r.readAsDataURL(file);
+}
+fileEl.addEventListener("change", () => { const f = fileEl.files[0]; if (f && activeSlot) loadFile(f, activeSlot); });
+document.addEventListener("paste", (e) => {
+  const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith("image/"));
+  if (!item) return;
+  e.preventDefault();
+  const keys = SLOTS[val("format")].map(s => s.key);
+  const key = (activeSlot && keys.includes(activeSlot)) ? activeSlot : (keys.find(k => !images[k]) || keys[0]);
+  loadFile(item.getAsFile(), key);
+});
+
+/* ---------- drawing helpers ---------- */
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function cover(img, x, y, w, h, align = "top") {
+  const s = Math.max(w / img.width, h / img.height);
+  const iw = img.width * s, ih = img.height * s;
+  const ix = x + (w - iw) / 2;
+  const iy = align === "top" ? y : y + (h - ih) / 2;
+  ctx.drawImage(img, ix, iy, iw, ih);
+}
+function slot(img, x, y, w, h, r, opts = {}) {
+  ctx.save();
+  if (opts.shadow) { ctx.shadowColor = "rgba(18,5,2,.18)"; ctx.shadowBlur = 40; ctx.shadowOffsetY = 16; }
+  rr(x, y, w, h, r); ctx.fillStyle = img ? C.white : C.placeholder; ctx.fill();
+  ctx.restore();
+  ctx.save(); rr(x, y, w, h, r); ctx.clip();
+  if (img) cover(img, x, y, w, h, opts.align || "top");
+  else {
+    ctx.fillStyle = C.placeholderInk; ctx.font = `500 ${opts.small ? 22 : 28}px Manrope`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    const lines = (opts.label || "Drop a screenshot").split("\n");
+    lines.forEach((l, i) => ctx.fillText(l, x + w / 2, y + h / 2 + (i - (lines.length - 1) / 2) * 34));
+  }
+  ctx.restore();
+  ctx.save(); rr(x, y, w, h, r); ctx.lineWidth = opts.stroke || 2; ctx.strokeStyle = opts.strokeColor || "rgba(18,5,2,.10)"; ctx.stroke(); ctx.restore();
+}
+function wrap(text, maxW, font, maxLines) {
+  ctx.font = font;
+  const words = text.split(/\s+/).filter(Boolean); const lines = []; let cur = "";
+  for (const w of words) {
+    const t = cur ? cur + " " + w : w;
+    if (ctx.measureText(t).width <= maxW || !cur) cur = t; else { lines.push(cur); cur = w; }
+  }
+  if (cur) lines.push(cur);
+  if (lines.length > maxLines) {
+    const kept = lines.slice(0, maxLines); let last = kept[maxLines - 1] + "…";
+    while (ctx.measureText(last).width > maxW && last.length > 2) last = last.slice(0, -2) + "…";
+    kept[maxLines - 1] = last; return { lines: kept, clipped: true };
+  }
+  return { lines, clipped: false };
+}
+function hexPath(cx, cy, r) {
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) { const a = Math.PI / 180 * (60 * i - 90); const px = cx + r * Math.cos(a), py = cy + r * Math.sin(a); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+  ctx.closePath();
+}
+function rand(i, j) { const s = Math.sin(i * 127.1 + j * 311.7) * 43758.5453; return s - Math.floor(s); }
+function hexBloom(corner, dark, region) {
+  if (corner === "off") return;
+  const ax = W, ay = corner === "tr" ? 0 : (region ? region.bottom : H);
+  const R = region ? 420 : 470, s = 26, rmax = 12.5, rowH = s * Math.sqrt(3) / 2;
+  ctx.save();
+  if (region) { ctx.beginPath(); ctx.rect(0, region.top, W, region.bottom - region.top); ctx.clip(); }
+  for (let j = -1; j * rowH < H + s; j++) {
+    for (let i = -1; i * s < W + s; i++) {
+      const cx = i * s + (j % 2 ? s / 2 : 0), cy = j * rowH;
+      const d = Math.hypot(cx - ax, cy - ay); const t = 1 - d / R;
+      if (t <= 0) continue;
+      const r = rmax * Math.pow(t, 1.5); if (r < 0.9) continue;
+      const orange = d < 200 && rand(i, j) < 0.32;
+      ctx.fillStyle = orange ? C.orange : (dark ? "rgba(246,239,228,.85)" : C.ink2);
+      hexPath(cx, cy, r); ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+const MARK_G = new Path2D("M166.8 90.7451L139.556 117.257H112.306V196.79L85.0571 223.302V90.7472L166.8 90.7451ZM166.8 157.023V223.302L139.556 201.208V179.117L112.306 157.025L166.8 157.023Z");
+function mark(x, y, size, dark) {
+  const k = size / 253.5;
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.translate(0, -27.78);
+  ctx.beginPath(); ctx.arc(126.757, 154.653, 126.757 - 23.03, 0, Math.PI * 2);
+  ctx.lineWidth = 46.07; ctx.strokeStyle = C.orange; ctx.stroke();
+  ctx.fillStyle = dark ? C.sand : C.ink2; ctx.fill(MARK_G, "evenodd");
+  ctx.restore();
+}
+function footer(dark, y) {
+  mark(PAD, y, 56, dark);
+  ctx.fillStyle = dark ? "rgba(246,239,228,.75)" : C.muted;
+  ctx.font = "600 24px Manrope"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  ctx.fillText("graphytedesign.com", PAD + 76, y + 28);
+}
+function headline(st, dark, top, maxW, size, maxLines) {
+  let y = top;
+  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  if (st.eyebrow) {
+    ctx.font = "700 24px Manrope"; ctx.fillStyle = dark ? "#FF8C66" : C.orange6;
+    ctx.letterSpacing = "3px"; ctx.fillText(st.eyebrow.toUpperCase(), PAD, y + 24); ctx.letterSpacing = "0px";
+    y += 24 + 22;
+  }
+  const font = `600 ${size}px "Instrument Sans"`;
+  const { lines, clipped } = wrap(st.line || "Write one plain line about the work.", maxW, font, maxLines);
+  const lh = Math.round(size * 1.12);
+  ctx.font = font; ctx.fillStyle = dark ? C.sand : C.ink2;
+  try { ctx.letterSpacing = `${-size * 0.015}px`; } catch (e) {}
+  lines.forEach((l, i) => ctx.fillText(l, PAD, y + size + i * lh));
+  try { ctx.letterSpacing = "0px"; } catch (e) {}
+  document.getElementById("line-hint").textContent = clipped ? "That's more than 4 lines, so it's cut off. Shorten it." : "One plain sentence or two. It wraps to 4 lines at most.";
+  return y + size + (lines.length - 1) * lh;
+}
+function pill(text, x, y, fill, color) {
+  ctx.font = "700 24px Manrope";
+  const w = ctx.measureText(text).width + 36;
+  ctx.save(); rr(x, y, w, 46, 23); ctx.fillStyle = fill; ctx.fill(); ctx.restore();
+  ctx.fillStyle = color; ctx.textBaseline = "middle"; ctx.textAlign = "left"; ctx.fillText(text, x + 18, y + 24);
+}
+
+/* ---------- formats ---------- */
+function draw() {
+  const st = state(); const dark = st.bg === "ink";
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = dark ? C.ink : C.sand; ctx.fillRect(0, 0, W, H);
+
+  if (st.format === "photo") {
+    const barH = 300, photoH = H - barH;
+    slot(images.photo, 0, 0, W, photoH, 0, { align: "center", label: "Drop a photo\nof their site, in their place", stroke: 0.01, strokeColor: "rgba(0,0,0,0)" });
+    ctx.fillStyle = dark ? C.ink : C.sand; ctx.fillRect(0, photoH, W, barH);
+    hexBloom(st.hex === "off" ? "off" : "br", dark, { top: photoH, bottom: H });
+    headline(st, dark, photoH + 44, W - PAD * 2 - 120, 48, 3);
+    mark(W - PAD - 56, H - PAD - 56, 56, dark);
+    return;
+  }
+
+  hexBloom(st.hex, dark);
+  const textBottom = headline(st, dark, PAD + 8, W - PAD * 2 - (st.hex === "tr" ? 170 : 0), 56, 4);
+  const footY = H - PAD - 56;
+  const top = textBottom + 52, bottom = footY - 44;
+
+  if (st.format === "screen") {
+    const phone = images.phone;
+    const dw = W - PAD * 2, dh = bottom - top - (phone ? 40 : 0);
+    slot(images.desktop, PAD, top, dw, dh, 16, { shadow: true, label: "Drop or paste a\ndesktop screenshot" });
+    if (phone) {
+      const pw = 250, ph = Math.min(540, dh * 0.82);
+      const px = W - PAD - pw + 20, py = top + dh - ph + 40;
+      ctx.save(); ctx.shadowColor = "rgba(18,5,2,.28)"; ctx.shadowBlur = 36; ctx.shadowOffsetY = 14;
+      rr(px - 8, py - 8, pw + 16, ph + 16, 40); ctx.fillStyle = C.ink2; ctx.fill(); ctx.restore();
+      slot(phone, px, py, pw, ph, 32, { stroke: 0.01, strokeColor: "rgba(0,0,0,0)" });
+    }
+  } else {
+    const gap = 28, h = (bottom - top - gap) / 2;
+    slot(images.before, PAD, top, W - PAD * 2, h, 14, { shadow: true, label: "Drop the before screenshot", small: true });
+    slot(images.after, PAD, top + h + gap, W - PAD * 2, h, 14, { shadow: true, label: "Drop the after screenshot", small: true });
+    pill("Before", PAD + 20, top + 20, dark ? "rgba(246,239,228,.92)" : "rgba(26,24,23,.88)", dark ? C.ink2 : C.sand);
+    pill("After", PAD + 20, top + h + gap + 20, C.orange, C.white);
+  }
+  footer(dark, footY);
+}
+
+let raf = 0;
+function schedule() { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
+document.getElementById("controls").addEventListener("input", (e) => { if (e.target.name === "format") buildDrops(); schedule(); });
+document.getElementById("controls").addEventListener("change", (e) => { if (e.target.name === "format") buildDrops(); schedule(); });
+
+function setStatus(t) { statusEl.textContent = t; }
+
+/* ---------- download ---------- */
+let downloads = null;
+const dlBtn = document.getElementById("download");
+dlBtn.addEventListener("click", async () => {
+  const st = state();
+  const needed = { screen: ["desktop"], ba: ["before", "after"], photo: ["photo"] }[st.format];
+  const missing = needed.filter(k => !images[k]);
+  if (missing.length) { setStatus("Add the " + missing.join(" and ") + " image first."); return; }
+  if (!downloads) { setStatus("Downloads aren't available in this view. Right-click the preview and choose Save Image."); return; }
+  dlBtn.disabled = true;
+  try {
+    const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
+    const slug = (st.eyebrow || st.line).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "post";
+    await downloads.save({ filename: `graphyte-${st.format}-${slug}.png`, data: blob });
+    setStatus("Saved.");
+  } catch (e) {
+    const code = e && e.code;
+    if (code === "declined") setStatus("");
+    else if (code === "rate_limited") setStatus("A save is already waiting for you. Finish that one first.");
+    else setStatus("Couldn't save the image. Right-click the preview and choose Save Image instead.");
+  } finally { dlBtn.disabled = false; }
+});
+
+(async () => {
+  buildDrops();
+  draw();
+  try { await Promise.all([document.fonts.load('600 60px "Instrument Sans"'), document.fonts.load("600 24px Manrope"), document.fonts.load("700 24px Manrope")]); } catch (e) {}
+  draw();
+  try { downloads = window.claude ? await window.claude.use("downloads") : null; } catch (e) { downloads = null; }
+})();
+</script>
+
+</body></html>

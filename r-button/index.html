@@ -1,0 +1,663 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>The r Button</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,700,100&family=Inter:wght@500;600;700&display=swap">
+<style>
+/* Layout: one phone screen. Light map fills it; the dark glass "r" button sits bottom-left where it lives in the app.
+   A small dark control pill at the top switches style + sound (mock scaffolding, not app UI). */
+:root{
+  --brand:#F5416B;        /* app pink (pins, bloom) */
+  --brand-2:#FF7A59;      /* warm edge of the pink */
+  --navy:#110D33;         /* app nav + disc base */
+  --navy-2:#272257;       /* disc highlight */
+  --ink:#F4F2FF;          /* text on navy */
+  --muted:#A9A4CF;        /* secondary text on navy */
+  --page:#0B0920;         /* desktop ground around the phone */
+
+  --map-land:#EDECE8; --map-water:#DADAD6; --map-park:#E3E3DE;
+  --map-road:#FFFFFF; --map-edge:#D7D6D2; --map-label:#6A6A66; --map-city:#3A3A37;
+
+  /* rainbow lives only in the ring */
+  --r1:#FF3D7F; --r2:#FF8A4C; --r3:#8B5CF6; --r4:#FF2D9B;
+
+  --font-glyph:'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-ui:'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --size:64px;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--font-ui);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;overflow:hidden}
+
+/* ---------- phone / screen ---------- */
+.phone{--safe-b:34px;position:relative;width:390px;height:844px;max-height:100%;border-radius:44px;overflow:hidden;
+  background:var(--map-land);box-shadow:0 40px 80px -20px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.08);
+  user-select:none;-webkit-user-select:none}
+@media (max-width:560px){
+  body{padding:0;display:block}
+  .phone{width:100%;height:100%;max-height:none;border-radius:0;box-shadow:none}
+}
+.map{position:absolute;inset:0;width:100%;height:100%;display:block}
+.map text{font-family:var(--font-ui);fill:var(--map-label);font-weight:500;font-size:10px}
+.map .city{fill:var(--map-city);font-size:22px;font-weight:600}
+.map .city.sm{font-size:15px}
+.map .hood{font-size:8px;font-weight:600;letter-spacing:.12em;fill:#7B7B77}
+.map .hwyU{stroke:#CFCECB;stroke-width:7;fill:none;stroke-linecap:round}
+.map .hwy{stroke:var(--map-road);stroke-width:4.5;fill:none;stroke-linecap:round}
+.map #minorU path{stroke:var(--map-edge);stroke-width:2.6;fill:none}
+.map #minor path{stroke:var(--map-road);stroke-width:1.5;fill:none}
+.map .shield rect{fill:#fff;stroke:#9C9C98;stroke-width:.8}
+.map .shield text{font-size:7.5px;font-weight:700;fill:#55554F}
+.map .pin circle{fill:var(--brand);stroke:#fff;stroke-width:2.6}
+.map .pin.dark circle{fill:#171427}
+.map .pin text{font-family:var(--font-glyph);font-variation-settings:"SOFT" 100,"opsz" 72;font-weight:700;font-size:17px;fill:#fff}
+
+/* ---------- controls pill (mock scaffolding) ---------- */
+.ctl{position:absolute;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;padding:6px;border-radius:24px;background:rgba(17,13,51,.9);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 10px 30px -10px rgba(17,13,51,.6),inset 0 1px 0 rgba(255,255,255,.08);
+  font-size:12px;font-weight:600;z-index:5;white-space:nowrap}
+.seg{display:flex;background:rgba(255,255,255,.06);border-radius:999px;padding:2px}
+.seg button,.ctl .tog{appearance:none;border:0;font:inherit;color:var(--muted);background:transparent;padding:7px 12px;border-radius:999px;cursor:pointer;line-height:1}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--navy)}
+.seg button:focus-visible,.ctl .tog:focus-visible,.rbtn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.ctl .state{display:flex;align-items:center;gap:6px;padding:0 10px 0 8px;color:var(--muted)}
+.ctl .state i{width:7px;height:7px;border-radius:50%;background:#4A4680;transition:background .25s,box-shadow .25s}
+.ctl .state[data-on="true"]{color:var(--ink)}
+.ctl .state[data-on="true"] i{background:var(--brand);box-shadow:0 0 10px var(--brand)}
+.ctl .tog{padding:7px 10px;background:rgba(255,255,255,.06)}
+.ctl .tog[aria-pressed="true"]{color:var(--ink);background:rgba(245,65,107,.22)}
+
+/* ---------- tab bar (mock of the app's bar, with the orb inside it) ---------- */
+/* the bar is a 64px pill whose left end bulges into a 78px circle around the button, with 10px concave fillets.
+   the box is 78px tall so the bump fits; the pill sits 7px inside it top and bottom. the shape is one SVG path. */
+.tabbar{--pill-inset:10px;position:absolute;left:max(22px,env(safe-area-inset-left,0px));right:max(22px,env(safe-area-inset-right,0px));bottom:calc(9px + var(--safe-b));
+  height:84px;z-index:3;display:flex;align-items:center;justify-content:space-between;padding:0 33px 0 98px}
+.barshape{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;filter:drop-shadow(0 12px 22px rgba(10,6,40,.5))}
+.tab{flex:0 0 auto;align-self:stretch;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:13px;font-weight:600;line-height:1;position:relative;text-decoration:none;padding-bottom:5px}
+.tab.active::after{content:"";position:absolute;left:50%;bottom:var(--pill-inset);width:32px;height:3px;border-radius:2px 2px 0 0;background:var(--brand);transform:translateX(-50%)}
+.tab svg{width:22px;height:22px;display:block}
+.tab.active{color:var(--brand)}
+.phone[data-place="float"] .tabbar{display:none}
+
+/* placement: inside the bar = smaller orb, sitting in the bar's left slot */
+.phone[data-place="bar"] .rbtn{--size:68px;left:calc(max(22px,env(safe-area-inset-left,0px)) + 8px);bottom:calc(17px + var(--safe-b))}
+
+/* ---------- simulated iPhone bottom safe area (34pt) + home indicator ---------- */
+.homebar{position:absolute;left:50%;bottom:8px;width:134px;height:5px;border-radius:3px;background:rgba(17,13,51,.85);transform:translateX(-50%);z-index:6;pointer-events:none}
+.safezone{position:absolute;left:0;right:0;bottom:0;height:var(--safe-b);display:none;z-index:5;pointer-events:none;
+  background:repeating-linear-gradient(135deg,rgba(245,65,107,.16) 0 6px,rgba(245,65,107,.03) 6px 12px);border-top:1px dashed rgba(245,65,107,.7)}
+.safezone span{position:absolute;right:12px;top:5px;font:600 10px/1 var(--font-ui);color:var(--brand);letter-spacing:.06em}
+.gapmark{position:absolute;left:63px;bottom:var(--safe-b);height:9px;width:1px;background:var(--brand);display:none;z-index:5;pointer-events:none}
+.gapmark::before,.gapmark::after{content:"";position:absolute;left:-3px;width:7px;height:1px;background:var(--brand)}
+.gapmark::before{top:0}.gapmark::after{bottom:0}
+.gapmark span{position:absolute;left:8px;top:-2px;font:600 10px/1 var(--font-ui);color:var(--brand);white-space:nowrap}
+.phone[data-safe="true"] .safezone,.phone[data-safe="true"] .gapmark{display:block}
+.phone[data-place="bar"] .hint{left:calc(max(16px,env(safe-area-inset-left,0px)) + 8px);bottom:calc(100px + env(safe-area-inset-bottom,0px))}
+.phone[data-place="bar"] .hint::before{left:22px;top:auto;bottom:-5px;transform:rotate(45deg)}
+
+/* reflection: the orb's light pooling on the surface under it */
+.pool{left:50%;top:calc(100% - 8px);width:150%;height:32%;transform:translateX(-50%);border-radius:50%;opacity:.55;
+  background:radial-gradient(ellipse at 50% 50%,rgba(255,110,160,.95),rgba(180,92,255,.55) 42%,rgba(245,65,107,0) 72%);
+  filter:blur(4px);transition:opacity .35s}
+.rbtn.pressed .pool{opacity:.9}
+.rbtn[data-on="true"] .pool{opacity:1;animation:poolbreathe 3.2s ease-in-out infinite}
+.phone[data-reflect="false"] .pool{display:none}
+@keyframes poolbreathe{0%,100%{transform:translateX(-50%) scaleX(1)}50%{transform:translateX(-50%) scaleX(1.18)}}
+
+/* ---------- the button ---------- */
+.rbtn{position:absolute;left:max(22px,env(safe-area-inset-left,0px));bottom:calc(30px + env(safe-area-inset-bottom,0px));
+  width:var(--size);height:var(--size);border-radius:50%;border:0;padding:0;background:transparent;cursor:pointer;
+  touch-action:manipulation;z-index:4;font-family:var(--font-glyph)}
+.rbtn > *{position:absolute;pointer-events:none}
+
+/* bloom: the soft pink light that leaks onto the map */
+.bloom{inset:-60%;border-radius:50%;
+  background:radial-gradient(circle,rgba(245,65,107,.70) 0%,rgba(139,92,246,.30) 38%,rgba(245,65,107,0) 68%);
+  filter:blur(10px);opacity:.28;transition:opacity .35s ease}
+.rbtn.pressed .bloom{opacity:.75}
+.rbtn[data-on="true"] .bloom{opacity:.95;animation:breathe 3.2s ease-in-out infinite}
+
+/* ring: two layers. soft = blurred liquid halo, sharp = crisp prism edge. both spin; the wrap whirls on press */
+.ringwrap{inset:calc(var(--size) * -0.094);border-radius:50%;transform:rotate(var(--whirl,0deg));transition:transform .75s cubic-bezier(.2,.8,.2,1)}
+.ring{position:absolute;inset:0;border-radius:50%}
+.ring i{position:absolute;inset:0;border-radius:50%;display:block;
+  background:conic-gradient(from 0deg,var(--r1) 0%,var(--r2) 12%,rgba(255,138,76,0) 24%,var(--r3) 36%,var(--r4) 50%,rgba(255,45,155,0) 60%,var(--r1) 72%,var(--r2) 82%,rgba(255,138,76,0) 92%,var(--r1) 100%);
+  -webkit-mask:radial-gradient(circle closest-side,transparent 72%,#000 77%);mask:radial-gradient(circle closest-side,transparent 72%,#000 77%)}
+.ring.soft{filter:blur(6px) saturate(1.35);opacity:.22;transition:opacity .3s,filter .3s;animation:wob 5s ease-in-out infinite}
+.ring.soft i{animation:spin 14s linear infinite}
+.ring.sharp{inset:1px;opacity:.95;transition:opacity .3s}
+.ring.sharp i{-webkit-mask:radial-gradient(circle closest-side,transparent 93%,#000 95%,#000 100%);mask:radial-gradient(circle closest-side,transparent 93%,#000 95%,#000 100%);
+  animation:spin 11s linear infinite reverse}
+.rbtn.pressed .ring.soft{opacity:.8;filter:blur(6px) saturate(1.6) brightness(1.35)}
+.rbtn.pressed .ring.sharp{opacity:1}
+.rbtn[data-on="true"] .ring.soft{opacity:.7;filter:blur(5px) saturate(1.5) brightness(1.15)}
+.rbtn[data-on="true"] .ring.soft i{animation-duration:5s}
+.rbtn[data-on="true"] .ring.sharp{opacity:1}
+.rbtn[data-on="true"] .ring.sharp i{animation-duration:4s}
+
+/* disc: the sphere. Pink by default (a big glossy version of the map pins); navy as the alternate */
+.disc{inset:0;border-radius:50%;overflow:hidden;transition:box-shadow .3s;
+  background:radial-gradient(circle at 50% 42%,#FF7A9A 0%,var(--brand) 52%,#D22457 100%);
+  box-shadow:inset 0 -6px 12px rgba(140,8,56,.45),inset 0 2px 3px rgba(255,255,255,.5),0 12px 26px -8px rgba(245,65,107,.6)}
+.rbtn[data-on="true"] .disc{box-shadow:inset 0 -6px 14px rgba(140,8,56,.5),inset 0 2px 3px rgba(255,255,255,.6),0 12px 30px -6px rgba(245,65,107,.85)}
+.gloss{inset:0;border-radius:50%;background:radial-gradient(70% 45% at 40% 8%,rgba(255,255,255,.6),rgba(255,255,255,.1) 50%,rgba(255,255,255,0) 64%)}
+.rim{inset:0;border-radius:50%;box-shadow:inset 0 0 0 calc(var(--size) * 0.039) rgba(255,255,255,.92);transition:box-shadow .3s}
+.rbtn[data-on="true"] .rim{box-shadow:inset 0 0 0 calc(var(--size) * 0.039) #fff,inset 0 0 0 calc(var(--size) * 0.055) rgba(255,255,255,.35)}
+
+/* orb interior: liquid swirl */
+.orb{inset:0;border-radius:50%;overflow:hidden;transition:filter .4s;filter:saturate(.9) brightness(.95)}
+.orb .swirl{position:absolute;inset:0;animation:spin 18s linear infinite}
+.orb i{position:absolute;width:82%;height:82%;border-radius:50%;filter:blur(5px);display:block}
+.orb .b1{left:-14%;top:-8%;background:radial-gradient(circle,#FFC4D3 0 22%,rgba(255,196,211,0) 68%);animation:f1 7s ease-in-out infinite}
+.orb .b2{right:-18%;top:6%;background:radial-gradient(circle,#FF2D9B 0 20%,rgba(255,45,155,0) 66%);animation:f2 9s ease-in-out infinite}
+.orb .b3{left:0;bottom:-20%;background:radial-gradient(circle,#B45CFF 0 22%,rgba(180,92,255,0) 66%);animation:f3 8s ease-in-out infinite}
+.orb .b4{right:-6%;bottom:-10%;width:64%;height:64%;background:radial-gradient(circle,var(--r2) 0 20%,rgba(255,138,76,0) 64%);animation:f4 6s ease-in-out infinite}
+.rbtn[data-on="true"] .orb,.rbtn.pressed .orb{filter:saturate(1.2) brightness(1.12)}
+.rbtn[data-on="true"] .orb .swirl{animation-duration:7s}
+
+/* navy alternate */
+.rbtn[data-style="navy"] .disc{background:radial-gradient(circle at 50% 50%,#1B1646,var(--navy) 70%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -3px 8px rgba(0,0,0,.55),0 12px 26px -8px rgba(17,13,51,.65)}
+.rbtn[data-style="navy"][data-on="true"] .disc{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -6px 14px rgba(245,65,107,.55),0 12px 26px -8px rgba(245,65,107,.55)}
+.rbtn[data-style="navy"] .rim{box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.rbtn[data-style="navy"][data-on="true"] .rim{box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+.rbtn[data-style="navy"] .gloss{background:radial-gradient(70% 45% at 40% 8%,rgba(255,255,255,.55),rgba(255,255,255,.08) 50%,rgba(255,255,255,0) 64%)}
+.rbtn[data-style="navy"] .orb{filter:saturate(.7) brightness(.6)}
+.rbtn[data-style="navy"][data-on="true"] .orb,.rbtn[data-style="navy"].pressed .orb{filter:saturate(1.35) brightness(1.25)}
+.rbtn[data-style="navy"] .orb .b1{background:radial-gradient(circle,var(--r1) 0 22%,rgba(255,61,127,0) 68%)}
+.rbtn[data-style="navy"] .orb .b2{background:radial-gradient(circle,var(--r4) 0 20%,rgba(255,45,155,0) 66%)}
+.rbtn[data-style="navy"] .orb .b3{background:radial-gradient(circle,var(--r3) 0 24%,rgba(139,92,246,0) 68%)}
+
+/* ---------- liquid fill variant: clear glass that fills with pink when on ---------- */
+.rbtn[data-style="fill"] .ringwrap,.rbtn[data-style="fill"] .orb{display:none}
+.rbtn[data-style="fill"] .disc{background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.14),rgba(255,255,255,.03) 42%,rgba(0,0,0,.28) 100%),#1C1750;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -2px 6px rgba(0,0,0,.45),0 10px 22px -8px rgba(0,0,0,.6)}
+.rbtn[data-style="fill"][data-on="true"] .disc{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -4px 10px rgba(255,120,160,.45),inset 0 0 0 1px rgba(255,255,255,.08),0 12px 28px -6px rgba(245,65,107,.7)}
+.rbtn[data-style="fill"].pressed .disc{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 0 18px rgba(255,255,255,.16),0 10px 22px -8px rgba(0,0,0,.6)}
+.rbtn[data-style="fill"] .rim{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.2)}
+.rbtn[data-style="fill"][data-on="true"] .rim{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55)}
+.rbtn[data-style="fill"] .gloss{background:radial-gradient(42% 30% at 32% 22%,rgba(255,255,255,.6),rgba(255,255,255,0) 100%),radial-gradient(50% 36% at 72% 86%,rgba(255,255,255,.14),rgba(255,255,255,0) 100%)}
+.rbtn[data-style="fill"] .bloom,.rbtn[data-style="fill"] .pool{opacity:0}
+.rbtn[data-style="fill"][data-on="true"] .bloom{opacity:.9}
+.rbtn[data-style="fill"][data-on="true"] .pool{opacity:1}
+.rbtn[data-style="fill"] .glyph{color:var(--brand);text-shadow:none;transition:color .35s,text-shadow .35s}
+.rbtn[data-style="fill"][data-on="true"] .glyph{color:#fff;text-shadow:0 1px 2px rgba(120,0,40,.45)}
+/* liquid body: 200% wide so it can tilt without showing edges. The disc spans 25%..75% of it. */
+.liquid{position:absolute;left:-50%;right:-50%;bottom:0;height:0%;display:none;transform-origin:50% 100%;rotate:var(--tilt,0deg);
+  background:
+    radial-gradient(20% 30% at 56% 92%,rgba(255,255,255,.22),rgba(255,255,255,0) 100%),
+    linear-gradient(90deg,rgba(60,0,25,.45) 25%,rgba(60,0,25,0) 37%,rgba(255,255,255,0) 63%,rgba(255,255,255,.09) 75%),
+    linear-gradient(180deg,#FF6D95 0%,#F0386B 30%,#D81F52 70%,#B4143F 100%);
+  transition:height 1s cubic-bezier(.2,.9,.3,1.14),transform .6s cubic-bezier(.34,1.56,.64,1)}
+.rbtn[data-style="fill"] .liquid{display:block}
+.rbtn[data-style="fill"][data-on="true"] .liquid{height:84%}
+.rbtn[data-style="fill"].pressed .liquid{transform:rotate(-8deg);transition:height 1s cubic-bezier(.2,.9,.3,1.14),transform .18s ease-out}
+.rbtn.slosh .liquid{animation:settle 1.4s cubic-bezier(.2,.8,.3,1) both}
+/* surface: the top of the liquid seen slightly from above, with a meniscus highlight */
+.surface{position:absolute;left:50%;top:0;width:38%;height:calc(var(--size) * 0.17);transform:translate(-50%,-50%);opacity:0;transition:opacity .7s}
+.rbtn[data-on="true"] .surface{opacity:1;transition:opacity .25s .15s}
+.surface i{position:absolute;inset:0;border-radius:50%;display:block;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 38%,#FFB3C9 0%,#FF86A8 55%,#FF6490 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 2px rgba(150,0,50,.35),0 1px 2px rgba(120,0,40,.3);
+  animation:rock 4.6s ease-in-out infinite}
+.surface i::after{content:"";position:absolute;inset:18% 22%;border-radius:50%;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.5),rgba(255,255,255,0));animation:drift 5.2s ease-in-out infinite}
+@keyframes rock{0%,100%{rotate:0deg;scale:1 1}30%{rotate:1.4deg;scale:1 1.07}65%{rotate:-1.2deg;scale:1 .94}}
+@keyframes drift{0%,100%{translate:-28% 0}50%{translate:28% 0}}
+@keyframes settle{0%{rotate:5deg}30%{rotate:-3.2deg}55%{rotate:1.8deg}78%{rotate:-.8deg}100%{rotate:0deg}}
+
+/* ---------- matte: a tonal keycap. flat material, one edge light, soft ambient shadow, spring press ---------- */
+.core{inset:0;transition:transform .42s cubic-bezier(.3,1.4,.5,1)}
+.core > *{position:absolute;pointer-events:none}
+.bezel{display:none}
+.rbtn[data-style^="matte"] .ringwrap,.rbtn[data-style^="matte"] .orb,.rbtn[data-style^="matte"] .liquid,.rbtn[data-style^="matte"] .pool,
+.rbtn[data-style^="matte"] .glint,.rbtn[data-style^="matte"] .gloss,.rbtn[data-style^="matte"] .rim{display:none}
+.rbtn[data-style^="matte"].pressed .core{transform:scale(.94);transition:transform .1s ease-out}
+.rbtn[data-style^="matte"] .disc{background:linear-gradient(180deg,#221C57,#1A1548);
+  transition:box-shadow .42s cubic-bezier(.3,1.4,.5,1),filter .1s;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),inset 0 -1px 2px rgba(0,0,0,.25),0 8px 20px -6px rgba(0,0,0,.45)}
+.rbtn[data-style^="matte"].pressed .disc{filter:brightness(1.18);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),inset 0 -1px 2px rgba(0,0,0,.25),0 3px 8px -4px rgba(0,0,0,.4)}
+.rbtn[data-style^="matte"][data-on="true"] .disc{
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 -1px 2px rgba(120,0,40,.25),0 10px 24px -6px rgba(245,65,107,.5)}
+.rbtn[data-style^="matte"][data-on="true"].pressed .disc{filter:brightness(.9)}
+/* the on state is a flat pink layer that crossfades in */
+.lacquer{position:absolute;inset:0;border-radius:50%;display:none;opacity:0;transition:opacity .22s;
+  background:linear-gradient(180deg,#FF5A80,#EF3A64)}
+.rbtn[data-style^="matte"] .lacquer{display:block}
+.rbtn[data-style^="matte"][data-on="true"] .lacquer{opacity:1}
+/* edge light: a 1px ring, bright at the top, gone by the sides. the only "lighting" on the button */
+.edge{inset:0;border-radius:50%;display:none;padding:1px;
+  background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.03) 45%,rgba(255,255,255,0) 68%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;transition:opacity .22s}
+.rbtn[data-style^="matte"] .edge{display:block}
+.rbtn[data-style^="matte"][data-on="true"] .edge{background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,.08) 45%,rgba(255,255,255,0) 68%)}
+/* the bar catches a little color when on. that is the only glow */
+.rbtn[data-style^="matte"] .bloom{inset:-35%;opacity:0;filter:blur(12px);animation:none;
+  background:radial-gradient(circle,rgba(245,65,107,.3),rgba(245,65,107,0) 65%)}
+.rbtn[data-style^="matte"][data-on="true"] .bloom{opacity:1;animation:none}
+.rbtn[data-style^="matte"] .glyph{color:var(--brand);text-shadow:none;transition:color .2s}
+.rbtn[data-style^="matte"][data-on="true"] .glyph{color:#fff;text-shadow:none}
+/* the letter stamps in a beat after the cap springs back */
+.rbtn[data-style^="matte"].pop .glyph b{animation:stamp .5s cubic-bezier(.3,1.5,.5,1) .04s both}
+@keyframes stamp{from{scale:.8}to{scale:1}}
+
+/* ---------- pin: the master pin. outline when off, filled when on. the ring irises closed. ---------- */
+@property --w{syntax:'<length>';inherits:false;initial-value:1.5px}
+.rbtn[data-style="pin"] .ringwrap,.rbtn[data-style="pin"] .orb,.rbtn[data-style="pin"] .liquid,.rbtn[data-style="pin"] .pool,
+.rbtn[data-style="pin"] .glint,.rbtn[data-style="pin"] .gloss,.rbtn[data-style="pin"] .rim,.rbtn[data-style="pin"] .lacquer{display:none}
+.rbtn[data-style="pin"].pressed .core{transform:scale(.96);transition:transform .1s ease-out}
+.rbtn[data-style="pin"][data-on="true"] .core{transform:translateY(-1px)}
+.rbtn[data-style="pin"][data-on="true"].pressed .core{transform:translateY(0) scale(.96)}
+.rbtn[data-style="pin"] .disc{background:radial-gradient(circle at 50% 45%,#1D1852 0%,#16113D 100%);
+  transition:box-shadow .42s cubic-bezier(.3,1.4,.5,1);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04),0 1px 2px rgba(0,0,0,.3)}
+.rbtn[data-style="pin"][data-on="true"] .disc{
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 1px 2px rgba(80,0,30,.35),0 10px 22px -4px rgba(245,65,107,.45)}
+/* the iris: a pink layer masked to a ring. the ring's width is the whole state machine */
+.iris{position:absolute;inset:0;border-radius:50%;display:none;--w:1.5px;
+  background:linear-gradient(180deg,#FF6F93 0%,#F5416B 42%,#DE2B5D 100%);
+  -webkit-mask:radial-gradient(circle closest-side,transparent calc(100% - var(--w)),#000 calc(100% - var(--w) + .75px));
+  mask:radial-gradient(circle closest-side,transparent calc(100% - var(--w)),#000 calc(100% - var(--w) + .75px));
+  transition:--w .3s cubic-bezier(.25,.9,.3,1)}
+.rbtn[data-style="pin"] .iris{display:block}
+.rbtn[data-style="pin"].pressed .iris{--w:4px;transition:--w .1s ease-out}
+.rbtn[data-style="pin"][data-on="true"] .iris{--w:40px;transition:--w .34s cubic-bezier(.2,.9,.25,1)}
+.rbtn[data-style="pin"][data-on="true"].pressed .iris{--w:40px}
+/* lit from a moving source: one soft light orbits the face, slowly */
+.orbit{position:absolute;inset:0;border-radius:50%;overflow:hidden;display:none;opacity:0;transition:opacity .5s .15s}
+.orbit i{position:absolute;inset:-25%;display:block;animation:spin 11s linear infinite;
+  background:radial-gradient(circle at 36% 32%,rgba(255,255,255,.2),rgba(255,255,255,0) 52%)}
+.rbtn[data-style="pin"] .orbit{display:block}
+.rbtn[data-style="pin"][data-on="true"] .orbit{opacity:1}
+/* fine grain so the gradients read as material, not vector */
+.grain{position:absolute;inset:0;border-radius:50%;display:none;opacity:.07;mix-blend-mode:overlay;background-size:120px 120px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E")}
+.rbtn[data-style="pin"] .grain{display:block}
+/* edge light appears with the lift */
+.rbtn[data-style="pin"] .edge{display:block;opacity:0;transition:opacity .3s;
+  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.1) 45%,rgba(255,255,255,0) 68%)}
+.rbtn[data-style="pin"][data-on="true"] .edge{opacity:1}
+/* the bar catches the pin's light */
+.rbtn[data-style="pin"] .bloom{inset:-35%;opacity:0;filter:blur(12px);animation:none;
+  background:radial-gradient(circle,rgba(245,65,107,.28),rgba(245,65,107,0) 65%)}
+.rbtn[data-style="pin"][data-on="true"] .bloom{opacity:1;animation:none}
+.rbtn[data-style="pin"] .glyph{color:var(--brand);text-shadow:none;transition:color .18s}
+.rbtn[data-style="pin"][data-on="true"] .glyph{color:#fff;text-shadow:none;transition:color .18s .1s}
+.rbtn[data-style="pin"].pop .glyph b{animation:stamp .5s cubic-bezier(.3,1.5,.5,1) .08s both}
+
+/* ---------- matte + light: a chrome-like rim. a few highlights drift around the edge, driven by noise, never repeating ---------- */
+.rimfx{inset:-2px;width:calc(100% + 4px);height:calc(100% + 4px);display:none;border-radius:50%}
+.rbtn[data-style="matte-glow"] .rimfx{display:block}
+
+/* ---------- matte + ring: the matte cap with the liquid orb's iridescent ring around it. nothing else changes ---------- */
+.rbtn[data-style="matte-ring"] .ringwrap{display:block}
+
+/* glint: a white highlight that sweeps the rim once per press */
+.glint{inset:-2px;border-radius:50%;opacity:0;
+  background:conic-gradient(from 0deg,rgba(255,255,255,0) 0 80%,rgba(255,255,255,.0) 85%,#fff 91%,rgba(255,255,255,0) 97%,rgba(255,255,255,0));
+  -webkit-mask:radial-gradient(circle closest-side,transparent 86%,#000 89%);mask:radial-gradient(circle closest-side,transparent 86%,#000 89%)}
+.glint.go{animation:glint .8s cubic-bezier(.2,.7,.2,1) forwards}
+
+/* glyph */
+.glyph{inset:0;display:grid;place-items:center;color:#fff;font-weight:700;font-size:calc(var(--size) * 0.72);line-height:1;
+  font-variation-settings:"SOFT" 100,"opsz" 72;text-shadow:0 1px 2px rgba(120,0,40,.45),0 0 0 rgba(255,255,255,0);transition:text-shadow .3s}
+.glyph b{display:inline-block;font-weight:inherit;line-height:1;transform:translate(var(--gx,0px),var(--gy,-3px))}
+.rbtn[data-on="true"] .glyph{text-shadow:0 1px 2px rgba(120,0,40,.45),0 0 14px rgba(255,255,255,.7)}
+
+/* burst fx */
+.fx{inset:0;border-radius:50%}
+.fx .ripple{position:absolute;inset:-2px;border-radius:50%;border:2px solid rgba(255,255,255,.9);opacity:0;animation:ripple .75s cubic-bezier(.1,.6,.3,1) forwards}
+.fx .ripple.hot{border-color:var(--brand);box-shadow:0 0 12px rgba(245,65,107,.7)}
+
+/* first-tap hint */
+.hint{position:absolute;left:calc(max(22px,env(safe-area-inset-left,0px)) + var(--size) + 14px);bottom:calc(30px + env(safe-area-inset-bottom,0px) + 20px);
+  z-index:3;background:rgba(17,13,51,.92);color:var(--ink);font-size:12px;font-weight:600;padding:8px 12px;border-radius:12px;
+  box-shadow:0 8px 24px -8px rgba(17,13,51,.6);transition:opacity .3s}
+.hint::before{content:"";position:absolute;left:-5px;top:50%;width:10px;height:10px;background:inherit;transform:translateY(-50%) rotate(45deg);border-radius:2px}
+.hint.bye{opacity:0}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes wob{0%,100%{transform:scale(1,1) rotate(0deg)}25%{transform:scale(1.05,.96) rotate(8deg)}50%{transform:scale(.97,1.05) rotate(-4deg)}75%{transform:scale(1.04,.98) rotate(6deg)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+@keyframes glint{0%{opacity:0;transform:rotate(0deg)}12%{opacity:1}100%{opacity:0;transform:rotate(360deg)}}
+@keyframes ripple{0%{transform:scale(1);opacity:.9}100%{transform:scale(2.9);opacity:0}}
+@keyframes f1{0%,100%{transform:translate(0,0)}50%{transform:translate(28%,22%)}}
+@keyframes f2{0%,100%{transform:translate(0,0)}50%{transform:translate(-30%,26%)}}
+@keyframes f3{0%,100%{transform:translate(0,0)}50%{transform:translate(26%,-30%)}}
+@keyframes f4{0%,100%{transform:translate(0,0)}50%{transform:translate(-24%,-26%)}}
+
+@media (prefers-reduced-motion:reduce){
+  .ring i,.ring.soft,.orb .swirl,.orb i,.bloom,.pool,.surface i,.surface i::after,.liquid,.glyph b,.orbit i{animation:none!important}
+  .ringwrap{transition:none}
+}
+</style>
+
+<div class="phone" id="phone" data-place="bar" data-reflect="true" data-safe="false">
+  <svg class="map" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <filter id="pinShadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity=".25"/></filter>
+    </defs>
+    <rect width="390" height="844" fill="var(--map-land)"/>
+    <!-- parks -->
+    <path fill="var(--map-park)" d="M220 40c40-18 90-10 120 20s10 70-30 80-70-5-95-30-25-55 5-70z"/>
+    <path fill="var(--map-park)" d="M40 560c30-20 70-10 90 20s-10 60-45 60-60-20-60-45 5-30 15-35z"/>
+    <path fill="var(--map-park)" d="M300 500c25-10 60 0 70 25s-5 45-35 45-50-15-55-35 5-30 20-35z"/>
+    <!-- water -->
+    <path fill="var(--map-water)" d="M325 210c20-14 48-8 58 12s2 40-18 48-45 0-52-16-6-34 12-44z"/>
+    <path fill="var(--map-water)" d="M180 300c14-10 36-6 44 8s0 32-14 36-34-2-38-14-4-24 8-30z"/>
+    <path fill="var(--map-water)" d="M60 150c12-8 30-5 36 7s0 26-12 29-28-2-31-12-3-19 7-24z"/>
+    <path fill="var(--map-water)" d="M250 420c10-6 24-4 29 5s0 20-9 23-22-1-25-9-3-15 5-19z"/>
+    <path fill="var(--map-water)" d="M-10 690c40-30 80-40 120-20s50 60 20 90-80 40-120 20-50-60-20-90z"/>
+    <!-- minor streets (generated) -->
+    <g id="minorU"></g><g id="minor"></g>
+    <!-- highways -->
+    <g class="hwyU">
+      <path d="M150 0C162 200 138 400 156 600S172 800 160 844"/>
+      <path d="M250 0C262 300 240 600 256 844"/>
+      <path d="M322 0C334 300 310 600 332 844"/>
+      <path d="M0 436C100 424 250 450 390 434"/>
+      <path d="M0 300C120 334 200 282 390 254"/>
+      <path d="M0 650C80 606 150 562 230 520S330 480 390 470"/>
+      <path d="M0 760C120 746 260 770 390 752"/>
+    </g>
+    <g class="hwy">
+      <path d="M150 0C162 200 138 400 156 600S172 800 160 844"/>
+      <path d="M250 0C262 300 240 600 256 844"/>
+      <path d="M322 0C334 300 310 600 332 844"/>
+      <path d="M0 436C100 424 250 450 390 434"/>
+      <path d="M0 300C120 334 200 282 390 254"/>
+      <path d="M0 650C80 606 150 562 230 520S330 480 390 470"/>
+      <path d="M0 760C120 746 260 770 390 752"/>
+    </g>
+    <!-- shields -->
+    <g class="shield" transform="translate(152 372)"><rect x="-13" y="-8" width="26" height="16" rx="4"/><text y="3" text-anchor="middle">35W</text></g>
+    <g class="shield" transform="translate(254 190)"><rect x="-13" y="-8" width="26" height="16" rx="4"/><text y="3" text-anchor="middle">35E</text></g>
+    <g class="shield" transform="translate(330 320)"><rect x="-11" y="-8" width="22" height="16" rx="4"/><text y="3" text-anchor="middle">61</text></g>
+    <g class="shield" transform="translate(90 438)"><rect x="-13" y="-8" width="26" height="16" rx="4"/><text y="3" text-anchor="middle">694</text></g>
+    <g class="shield" transform="translate(60 312)"><rect x="-11" y="-8" width="22" height="16" rx="4"/><text y="3" text-anchor="middle">10</text></g>
+    <g class="shield" transform="translate(206 534)"><rect x="-11" y="-8" width="22" height="16" rx="4"/><text y="3" text-anchor="middle">94</text></g>
+    <g class="shield" transform="translate(300 758)"><rect x="-11" y="-8" width="22" height="16" rx="4"/><text y="3" text-anchor="middle">52</text></g>
+    <!-- labels -->
+    <text x="62" y="70">Blaine</text>
+    <text x="178" y="110">Circle Pines</text>
+    <text x="294" y="132">Hugo</text>
+    <text x="150" y="212" class="hood">LEXINGTON</text>
+    <text x="44" y="242">Fridley</text>
+    <text x="196" y="246">North Oaks</text>
+    <text x="150" y="330">Shoreview</text>
+    <text x="300" y="300">Dellwood</text>
+    <text x="40" y="392">Columbia Heights</text>
+    <text x="178" y="400">Arden Hills</text>
+    <text x="246" y="378">Vadnais Heights</text>
+    <text x="306" y="402">White Bear Lake</text>
+    <text x="216" y="478">Little Canada</text>
+    <text x="150" y="520">Roseville</text>
+    <text x="298" y="520">North St Paul</text>
+    <text x="44" y="528" class="hood">NORTHEAST MINNEAPOLIS</text>
+    <text x="150" y="578" class="hood">COMO PARK</text>
+    <text x="262" y="580" class="hood">PAYNE · PHALEN</text>
+    <text x="8" y="608" class="city">Minneapolis</text>
+    <text x="224" y="636" class="city sm">St Paul</text>
+    <text x="312" y="636">Maplewood</text>
+    <text x="196" y="700">Mississippi National</text>
+    <text x="206" y="712">River &amp; Recreation</text>
+    <text x="330" y="700">Oakdale</text>
+    <text x="150" y="800">Eagan</text>
+    <text x="260" y="820">Rosemount</text>
+    <!-- pins -->
+    <g filter="url(#pinShadow)">
+      <g class="pin" transform="translate(166 100)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+      <g class="pin" transform="translate(318 98)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+      <g class="pin" transform="translate(96 136)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+      <g class="pin" transform="translate(72 190)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+      <g class="pin" transform="translate(98 204)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+      <g class="pin dark" transform="translate(202 228)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+      <g class="pin" transform="translate(326 240)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+      <g class="pin" transform="translate(354 252)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+      <g class="pin" transform="translate(338 268)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+      <g class="pin" transform="translate(84 270)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+      <g class="pin" transform="translate(102 290)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+      <g class="pin" transform="translate(236 560)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+      <g class="pin" transform="translate(300 690)"><circle r="14"/><text y="6" text-anchor="middle">r</text></g>
+    </g>
+  </svg>
+
+
+  <div class="ctl" role="group" aria-label="Mock controls">
+    <div class="seg" role="group" aria-label="Button style">
+      <button type="button" id="pickMatte" data-pick="matte" aria-pressed="true">Matte</button>
+      <button type="button" id="pickGlow" data-pick="matte-glow" aria-pressed="false">Matte + light</button>
+      <button type="button" id="pickMatteRing" data-pick="matte-ring" aria-pressed="false">Matte + ring</button>
+      <button type="button" id="pickNavy" data-pick="navy" aria-pressed="false">Liquid orb</button>
+    </div>
+    <div class="state" id="state" data-on="false"><i></i><span id="stateText">Best spots: off</span></div>
+    <button type="button" class="tog" id="safeBtn" aria-pressed="false">Safe area</button>
+    <button type="button" class="tog" id="soundBtn" aria-pressed="false">Sound off</button>
+  </div>
+
+  <div class="safezone" aria-hidden="true"><span>SAFE AREA · 34pt</span></div>
+  <div class="gapmark" aria-hidden="true"><span>9pt</span></div>
+  <div class="homebar" aria-hidden="true"></div>
+
+
+  <nav class="tabbar" aria-label="App tabs (mock)">
+    <svg class="barshape" aria-hidden="true">
+      <defs>
+        <linearGradient id="barFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#171346"/><stop offset="1" stop-color="#100C30"/></linearGradient>
+        <linearGradient id="barEdgeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".12"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <clipPath id="barClip"><path id="barClipPath"/></clipPath>
+      </defs>
+      <path id="barPath" fill="url(#barFill)"/>
+      <path id="barEdge" fill="none" stroke="url(#barEdgeG)" stroke-width="2" clip-path="url(#barClip)"/>
+    </svg>
+    <a class="tab active" href="#explore" onclick="return false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/></svg>
+      Explore
+    </a>
+    <a class="tab" href="#lists" onclick="return false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+      Your Lists
+    </a>
+    <a class="tab" href="#more" onclick="return false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 9h16M4 15h16"/></svg>
+      More
+    </a>
+  </nav>
+
+  <button type="button" class="rbtn" id="rbtn" data-style="matte" data-on="false" role="switch" aria-checked="false" aria-label="Show only the best restaurants">
+    <span class="bloom"></span>
+    <span class="pool"></span>
+    <span class="ringwrap">
+      <span class="ring soft"><i></i></span>
+      <span class="ring sharp"><i></i></span>
+    </span>
+    <span class="bezel"></span>
+    <span class="core">
+      <span class="disc">
+        <span class="orb"><span class="swirl"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i></span></span>
+        <span class="liquid"><span class="surface"><i></i></span></span>
+        <span class="lacquer"></span>
+        <span class="iris"></span>
+        <span class="orbit"><i></i></span>
+        <span class="grain"></span>
+        <span class="gloss"></span>
+      </span>
+      <span class="edge"></span>
+      <span class="rim"></span>
+      <span class="glyph"><b id="glyphInk">r</b></span>
+      <canvas class="rimfx" aria-hidden="true"></canvas>
+    </span>
+    <span class="glint"></span>
+    <span class="fx"></span>
+  </button>
+</div>
+
+<script>
+(function(){
+  // ---- generated minor streets (seeded so it looks the same every load)
+  var seed=11, ns='http://www.w3.org/2000/svg';
+  function rnd(){ seed=(seed*16807)%2147483647; return seed/2147483647; }
+  function j(a){ return (rnd()-.5)*a; }
+  var gU=document.getElementById('minorU'), g=document.getElementById('minor'), d=[];
+  for(var x=18;x<390;x+=30+rnd()*22){ if(rnd()<.15) continue; d.push('M'+(x+j(10))+' 0C'+(x+j(26))+' 280 '+(x+j(26))+' 560 '+(x+j(14))+' 844'); }
+  for(var y=16;y<844;y+=32+rnd()*24){ if(rnd()<.15) continue; d.push('M0 '+(y+j(10))+'C130 '+(y+j(26))+' 260 '+(y+j(26))+' 390 '+(y+j(14))); }
+  for(var k=0;k<6;k++){ var sx=rnd()*390, sy=rnd()*844; d.push('M'+sx+' '+sy+'l'+(j(160))+' '+(j(160))); }
+  d.forEach(function(dd){ [gU,g].forEach(function(grp){ var p=document.createElementNS(ns,'path'); p.setAttribute('d',dd); grp.appendChild(p); }); });
+
+  // ---- button
+  var btn=document.getElementById('rbtn'), fx=btn.querySelector('.fx'), wrap=btn.querySelector('.ringwrap'), glint=btn.querySelector('.glint');
+  var state=document.getElementById('state'), stateText=document.getElementById('stateText'), soundBtn=document.getElementById('soundBtn');
+  var noop={setAttribute:function(){},addEventListener:function(){},dataset:{}}; state=state||noop; stateText=stateText||{}; soundBtn=soundBtn||noop;
+  var phone=document.getElementById('phone');
+  var on=false, whirl=0, sound=false, ac=null;
+  try{ sound = localStorage.getItem('rbtn-sound')==='1';
+    var st=localStorage.getItem('rbtn-style4'); if(st==='matte'||st==='matte-glow'||st==='matte-ring'||st==='navy') setStyle(st);
+  }catch(e){}
+  paintSound();
+
+  btn.addEventListener('pointerdown', function(){ btn.classList.add('pressed'); whirl+=180; wrap.style.setProperty('--whirl', whirl+'deg'); });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){ btn.addEventListener(t, function(){ btn.classList.remove('pressed'); }); });
+  btn.addEventListener('click', toggle);
+
+  function toggle(){
+    on=!on;
+    btn.dataset.on=String(on); btn.setAttribute('aria-checked', String(on));
+    state.dataset.on=String(on); stateText.textContent = on ? 'Best spots: ON' : 'Best spots: off';
+    if(btn.dataset.style.indexOf('matte')===0||btn.dataset.style==='pin'){
+      btn.classList.remove('pop'); if(on){ void btn.offsetWidth; btn.classList.add('pop'); }
+    } else {
+      sweep(); ripple(0); ripple(130);
+      btn.classList.remove('slosh'); void btn.offsetWidth; btn.classList.add('slosh');
+    }
+    try{ if(navigator.vibrate) navigator.vibrate(on ? [8,30,14] : 8); }catch(e){}
+    if(sound) pop(on);
+  }
+  function sweep(){ glint.classList.remove('go'); void glint.offsetWidth; glint.classList.add('go'); }
+  function ripple(delay){ setTimeout(function(){ var r=document.createElement('i'); r.className='ripple'+(on?' hot':''); fx.appendChild(r); r.addEventListener('animationend', function(){ r.remove(); }); }, delay); }
+  function pop(isOn){
+    try{
+      ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+      if(ac.state==='suspended') ac.resume();
+      var t=ac.currentTime, o=ac.createOscillator(), gn=ac.createGain();
+      o.type='sine'; o.frequency.setValueAtTime(isOn?480:420,t); o.frequency.exponentialRampToValueAtTime(isOn?960:240,t+.09);
+      gn.gain.setValueAtTime(.0001,t); gn.gain.exponentialRampToValueAtTime(.22,t+.012); gn.gain.exponentialRampToValueAtTime(.0001,t+.16);
+      o.connect(gn).connect(ac.destination); o.start(t); o.stop(t+.18);
+    }catch(e){}
+  }
+
+  // ---- tilt with the phone. Works where the browser allows motion sensors (needs https + a tap on iOS); dormant otherwise.
+  var tiltTarget=0, tiltNow=0, tiltVel=0, tiltRunning=false;
+  function onOrient(e){ if(e.gamma==null) return; tiltTarget=Math.max(-14,Math.min(14,-e.gamma*0.55)); if(!tiltRunning){ tiltRunning=true; requestAnimationFrame(tiltLoop); } }
+  function tiltLoop(){ /* spring toward the target so it sloshes instead of snapping */
+    tiltVel=(tiltVel+(tiltTarget-tiltNow)*0.08)*0.78; tiltNow+=tiltVel;
+    btn.style.setProperty('--tilt', tiltNow.toFixed(2)+'deg'); requestAnimationFrame(tiltLoop); }
+  function enableTilt(){
+    try{
+      if(typeof DeviceOrientationEvent==='undefined') return;
+      if(typeof DeviceOrientationEvent.requestPermission==='function'){
+        DeviceOrientationEvent.requestPermission().then(function(r){ if(r==='granted') window.addEventListener('deviceorientation', onOrient); }).catch(function(){});
+      } else { window.addEventListener('deviceorientation', onOrient); }
+    }catch(e){}
+  }
+  btn.addEventListener('pointerdown', enableTilt, {once:true});
+
+  // ---- the bar shape: pill + bump around the button + concave fillets, drawn from the bar's real size
+  var bar=document.querySelector('.tabbar'), barPath=document.getElementById('barPath'), barEdge=document.getElementById('barEdge'), barClipPath=document.getElementById('barClipPath');
+  function drawBar(){
+    var W=bar.clientWidth, Hb=bar.clientHeight, inset=parseFloat(getComputedStyle(bar).getPropertyValue('--pill-inset'))||7;
+    var Rb=Hb/2, cx=Rb, cy=Rb, R=Rb-inset, Rf=12, yt=cy-R, yb=cy+R;
+    var dx=Math.sqrt((Rb+Rf)*(Rb+Rf)-(R+Rf)*(R+Rf)), fx=cx+dx, k=Rb/(Rb+Rf);
+    var ax=cx+(fx-cx)*k, ayT=cy+((yt-Rf)-cy)*k, ayB=cy+((yb+Rf)-cy)*k;
+    var f=function(n){ return n.toFixed(2); };
+    var d='M'+f(ax)+' '+f(ayT)+' A'+Rf+' '+Rf+' 0 0 0 '+f(fx)+' '+f(yt)+' H'+f(W-R)+' A'+R+' '+R+' 0 0 1 '+f(W-R)+' '+f(yb)+' H'+f(fx)+' A'+Rf+' '+Rf+' 0 0 0 '+f(ax)+' '+f(ayB)+' A'+Rb+' '+Rb+' 0 1 1 '+f(ax)+' '+f(ayT)+' Z';
+    barPath.setAttribute('d',d); barEdge.setAttribute('d',d); barClipPath.setAttribute('d',d);
+  }
+  drawBar(); window.addEventListener('resize', drawBar);
+  if(window.ResizeObserver) new ResizeObserver(drawBar).observe(bar);
+
+  // ---- rim light: a chrome-like reflection. four highlights with their own drift, wobble, width and brightness,
+  //      all driven by sums of sines at unrelated frequencies, so the motion reads as a reflection of a scene, not a loop.
+  var rim=btn.querySelector('.rimfx'), rctx=rim.getContext('2d'), rimRaf=0, rimTime=0, rimLast=0;
+  var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hl=[ {a:-1.1, drift:.045, amp:.9,  w1:.11, w2:.07, p:0, wid:.55, i:1.0},
+           {a: 1.9, drift:-.03, amp:1.2, w1:.07, w2:.05, p:2, wid:.35, i:.7},
+           {a: 0.4, drift:.08,  amp:.6,  w1:.13, w2:.09, p:4, wid:.8,  i:.45},
+           {a: 3.6, drift:-.06, amp:1.5, w1:.05, w2:.11, p:1, wid:.25, i:.6} ];
+  function rimIntensity(ang,t,on){
+    var v=.05+.10*Math.max(0,Math.cos(ang+Math.PI/2))+.04*Math.max(0,Math.cos(ang-Math.PI/2))+(on?.10:0);
+    for(var k=0;k<hl.length;k++){ var h=hl[k];
+      var pos=h.a+h.drift*t+h.amp*Math.sin(t*h.w1+h.p)+.5*h.amp*Math.sin(t*h.w2*1.7+h.p*2);
+      var wid=h.wid*(1+.3*Math.sin(t*h.w2+h.p));
+      var inten=h.i*(.55+.45*Math.sin(t*h.w1*1.3+h.p*3));
+      var d=Math.atan2(Math.sin(ang-pos),Math.cos(ang-pos));
+      v+=inten*Math.exp(-(d*d)/(2*wid*wid)); }
+    return Math.min(1,v);
+  }
+  var rimPasses=[{lw:5,off:3.1,mul:.035},{lw:2.6,off:1.9,mul:.06},{lw:1.25,off:.62,mul:.55}];
+  function rimDraw(t){
+    var dpr=window.devicePixelRatio||1, cssS=rim.clientWidth; if(!cssS) return;
+    var px=Math.round(cssS*dpr); if(rim.width!==px){ rim.width=rim.height=px; }
+    var S=px, c=S/2, edge=c-2*dpr, on=btn.dataset.on==='true', N=120, step=Math.PI*2/N;
+    rctx.clearRect(0,0,S,S); rctx.lineCap='butt';
+    for(var q=0;q<rimPasses.length;q++){ var ps=rimPasses[q], rr=edge-ps.off*dpr; rctx.lineWidth=ps.lw*dpr;
+      for(var i=0;i<N;i++){ var a0=i*step, v=rimIntensity(a0+step/2,t,on)*ps.mul*(on?1.2:1); if(v<.008) continue;
+        var w=Math.min(1,v*1.4);
+        rctx.strokeStyle='rgba('+Math.round(205+50*w)+','+Math.round(200+55*w)+',255,'+v.toFixed(3)+')';
+        rctx.beginPath(); rctx.arc(c,c,rr,a0,a0+step*1.02); rctx.stroke(); } }
+  }
+  function rimFrame(now){
+    if(!rimLast) rimLast=now; var dt=Math.min(.05,(now-rimLast)/1000); rimLast=now;
+    rimTime+=dt*(btn.classList.contains('pressed')?.25:1);
+    rimDraw(rimTime); rimRaf=requestAnimationFrame(rimFrame);
+  }
+  function rimStart(){ if(btn.dataset.style!=='matte-glow') return; if(reduced){ rimDraw(7.3); return; } if(!rimRaf) rimRaf=requestAnimationFrame(rimFrame); }
+  function rimStop(){ if(rimRaf) cancelAnimationFrame(rimRaf); rimRaf=0; rimLast=0; }
+  document.addEventListener('visibilitychange', function(){ document.hidden ? rimStop() : rimStart(); });
+  rimStart();
+
+  // ---- optical centering: measure the real ink of the "r" and shift it so the ink center = disc center
+  function centerGlyph(){
+    try{
+      var el=document.getElementById('glyphInk'), cs=getComputedStyle(el), size=parseFloat(cs.fontSize);
+      var c=document.createElement('canvas').getContext('2d');
+      c.font=cs.fontWeight+' '+size+'px '+cs.fontFamily; c.textBaseline='alphabetic';
+      var m=c.measureText('r');
+      if(m.actualBoundingBoxLeft===undefined||m.fontBoundingBoxAscent===undefined) return;
+      var A=m.fontBoundingBoxAscent, D=m.fontBoundingBoxDescent;
+      var baseline=(size-(A+D))/2+A;                       // baseline y inside a line-height:1 box
+      var inkCx=(-m.actualBoundingBoxLeft+m.actualBoundingBoxRight)/2;
+      var inkCy=baseline+(-m.actualBoundingBoxAscent+m.actualBoundingBoxDescent)/2;
+      var dx=m.width/2-inkCx, dy=size/2-inkCy;
+      el.style.setProperty('--gx', dx.toFixed(2)+'px'); el.style.setProperty('--gy', dy.toFixed(2)+'px');
+    }catch(e){}
+  }
+  // same idea for the map pins: center the ink of the "r" on the pin's center
+  function centerPins(){
+    try{
+      var c=document.createElement('canvas').getContext('2d');
+      c.font='700 17px '+getComputedStyle(document.documentElement).getPropertyValue('--font-glyph'); c.textAlign='center'; c.textBaseline='alphabetic';
+      var m=c.measureText('r'); if(m.actualBoundingBoxLeft===undefined) return;
+      var dx=-((-m.actualBoundingBoxLeft+m.actualBoundingBoxRight)/2), dy=-((-m.actualBoundingBoxAscent+m.actualBoundingBoxDescent)/2);
+      document.querySelectorAll('.map .pin text').forEach(function(t){ t.setAttribute('x', dx.toFixed(2)); t.setAttribute('y', dy.toFixed(2)); });
+    }catch(e){}
+  }
+  centerGlyph(); centerPins();
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ centerGlyph(); centerPins(); });
+  window.addEventListener('load', function(){ centerGlyph(); centerPins(); });
+
+  // ---- mock controls
+  var safeBtn=document.getElementById('safeBtn')||noop;
+  safeBtn.addEventListener('click', function(){ var v=phone.dataset.safe!=='true'; phone.dataset.safe=String(v); safeBtn.setAttribute('aria-pressed', String(v)); });
+  function setStyle(s){ btn.dataset.style=s; document.querySelectorAll('[data-pick]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.pick===s)); }); try{ localStorage.setItem('rbtn-style4', s); }catch(e){} if(typeof rimStop==='function'){ rimStop(); rimStart(); } }
+  document.querySelectorAll('[data-pick]').forEach(function(b){ b.addEventListener('click', function(){ setStyle(b.dataset.pick); }); });
+  function paintSound(){ soundBtn.setAttribute('aria-pressed', String(sound)); soundBtn.textContent = sound ? 'Sound on' : 'Sound off'; }
+  soundBtn.addEventListener('click', function(){ sound=!sound; paintSound(); try{ localStorage.setItem('rbtn-sound', sound?'1':'0'); }catch(e){} if(sound) pop(true); });
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Graphyte Gallery</title>
+<meta name="description" content="Tools, templates and design experiments from Graphyte, built with Claude.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,900&display=swap">
+<style>
+:root{
+  --bg:#f6f5f2; --paper:#ffffff; --ink:#16161a; --ash:#5d5d66; --line:#e2e0da; --accent:#2f5bea; --chip:#efede8;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#121214; --paper:#1b1b1f; --ink:#f2f2f4; --ash:#a3a3ad; --line:#2c2c33; --accent:#7d9bff; --chip:#26262c;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121214; --paper:#1b1b1f; --ink:#f2f2f4; --ash:#a3a3ad; --line:#2c2c33; --accent:#7d9bff; --chip:#26262c;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Nunito Sans",-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+@media (min-width:720px){.wrap{padding:0 32px}}
+h1,h2,h3{font-family:"Avenir Next","Avenir","Nunito Sans",sans-serif;font-weight:900;letter-spacing:-.01em;margin:0;text-wrap:balance}
+header{padding:clamp(48px,8vw,96px) 0 clamp(28px,4vw,44px)}
+header h1{font-size:clamp(40px,6.5vw,72px);line-height:1.02}
+header h1 span{color:var(--accent)}
+header p{color:var(--ash);font-size:clamp(17px,1.6vw,20px);max-width:34em;margin:16px 0 0;text-wrap:pretty}
+section{padding-bottom:clamp(36px,5vw,56px)}
+section>h2{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--ash);font-weight:600;font-family:inherit;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}
+a.card{display:flex;flex-direction:column;gap:8px;padding:20px 22px 22px;background:var(--paper);border:1px solid var(--line);border-radius:14px;color:inherit;text-decoration:none;transition:border-color .15s,transform .15s}
+a.card:hover{border-color:var(--ink);transform:translateY(-2px)}
+a.card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){a.card,a.card:hover{transition:none;transform:none}}
+.card h3{font-size:22px;line-height:1.2}
+.card p{margin:0;color:var(--ash);font-size:15px;text-wrap:pretty}
+.card .note{margin-top:auto;padding-top:8px;font-size:13px;color:var(--ash)}
+.card .note span{background:var(--chip);border-radius:999px;padding:2px 10px;display:inline-block}
+footer{border-top:1px solid var(--line);padding:24px 0 48px;color:var(--ash);font-size:14px}
+footer a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Graphyte <span>Gallery</span></h1>
+    <p>Tools, templates and design experiments from Graphyte, a small web studio. Each one started as a working page built with Claude. These are static snapshots, so a few features that needed a live account are switched off or use example data.</p>
+  </header>
+
+  <section>
+    <h2>Tools</h2>
+    <div class="grid">
+      <a class="card" href="hex-generator/">
+        <h3>Hex Generator</h3>
+        <p>Shape a graphite hexagon lattice with sliders, watch it fade by cell size, and copy it as SVG.</p>
+      </a>
+      <a class="card" href="post-maker/">
+        <h3>Post Maker</h3>
+        <p>Drop in a screenshot and write one line to get a branded 1080×1350 image for LinkedIn and Instagram.</p>
+        <div class="note"><span>Right-click the preview to save it</span></div>
+      </a>
+      <a class="card" href="pricing-calculator/">
+        <h3>Pricing Calculator</h3>
+        <p>Services, complexity, risk and timeline turn into a floor-to-stretch price range with a value check.</p>
+        <div class="note"><span>Runs on example numbers</span></div>
+      </a>
+      <a class="card" href="og-image/">
+        <h3>Share Image Picker</h3>
+        <p>Three 1200×630 share images, each previewed as a LinkedIn, X, iMessage and chat-app card.</p>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Templates and frameworks</h2>
+    <div class="grid">
+      <a class="card" href="web-design-master-map/">
+        <h3>Web Design Master Map</h3>
+        <p>A web design process from intro call to launch, drawn as a transit map, with separate views for the client, the team and the agents.</p>
+      </a>
+      <a class="card" href="client-questionnaire/">
+        <h3>Client Questionnaire</h3>
+        <p>A six-part questionnaire to send before kickoff. Blank, "not sure" and vague answers become the agenda for the kickoff call.</p>
+      </a>
+      <a class="card" href="client-view-demo/">
+        <h3>Client View</h3>
+        <p>A project board for clients with their tasks, what needs their review, what's next and what got done this week.</p>
+        <div class="note"><span>Example project</span></div>
+      </a>
+      <a class="card" href="one-picture-template/">
+        <h3>One Picture</h3>
+        <p>A one-page vision template with seven slots, a blank copy and a worked example.</p>
+      </a>
+      <a class="card" href="messaging-house/">
+        <h3>Messaging House</h3>
+        <p>A plain-English guide to messaging houses, positioning tools and voice, and how to turn them into a copy pipeline.</p>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Design experiments</h2>
+    <div class="grid">
+      <a class="card" href="footer-ideas/">
+        <h3>Footer Ideas</h3>
+        <p>Three footers built on a hex lattice drawn live in the browser: Ink bloom, Horizon and Stamp.</p>
+      </a>
+      <a class="card" href="r-button/">
+        <h3>The r Button</h3>
+        <p>A glowing map toggle shown four ways (matte, lit, ringed and liquid orb), with a safe-area overlay and optional sound.</p>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>At home</h2>
+    <div class="grid">
+      <a class="card" href="recipe-box/">
+        <h3>Recipe Box</h3>
+        <p>A family meal planner. Vote on recipes over six rounds, keep the ones you like, and set which basics to buy each week.</p>
+        <div class="note"><span>Votes save in your browser</span></div>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <a href="https://graphytedesign.com">graphytedesign.com</a>
+  </footer>
+</div>
+</body>
+</html>

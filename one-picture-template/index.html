@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One Picture Template</title>
+<style>
+:root{--bg:#faf9f5;--fg:#141413;--muted:#5e5d59;--line:#e0ddd4;--code:#f0eee6;color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1a1915;--fg:#f0eee6;--muted:#a8a59b;--line:#3a3833;--code:#26251f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1a1915;--fg:#f0eee6;--muted:#a8a59b;--line:#3a3833;--code:#26251f;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 Georgia,"Times New Roman",serif}
+main{max-width:720px;margin:0 auto;padding:48px 16px 96px}
+h1,h2{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.2;text-wrap:balance}
+h1{font-size:clamp(28px,5vw,38px);margin:0 0 8px}
+h2{font-size:22px;margin:40px 0 12px}
+p{margin:0 0 14px}
+time,[data-atom="mention"]{color:var(--muted);font-size:14px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:0 0 16px}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+li p{margin:0 0 6px}
+pre{background:var(--code);border:1px solid var(--line);padding:14px;overflow-x:auto;font-size:13.5px;line-height:1.55;white-space:pre}
+</style>
+</head>
+<body>
+<main>
+<h1 id="one-picture-vision-template">One Picture: Vision Template</h1>
+<p><time data-atom="date" datetime="2026-10-07">2026-10-07</time></p>
+<p>One vision, one page, read in 60 seconds: seven slots that take a big idea from scattered to focused.</p>
+<h2 id="the-seven-slots">The seven slots</h2>
+<p>Slots 1, 4 and 7 are the busy-reader version; the rest is for anyone who reads on.</p>
+<table><thead><tr><th>#</th><th>Slot</th><th>What it says</th><th>Limit</th></tr></thead><tbody><tr><td>1</td><td>Headline</td><td>What changes, for whom, by when</td><td>1 sentence</td></tr><tr><td>2</td><td>Why now</td><td>What shifted, and the cost of staying put</td><td>2–3 sentences</td></tr><tr><td>3</td><td>The picture</td><td>One concrete scene from the future where it worked</td><td>3 sentences</td></tr><tr><td>4</td><td>The bet</td><td>The one choice it rests on, and what you won&#39;t do</td><td>2 sentences</td></tr><tr><td>5</td><td>Three moves</td><td>The steps, in order</td><td>3 lines</td></tr><tr><td>6</td><td>How we&#39;ll know</td><td>Signs you can see or count</td><td>1–3 signs</td></tr><tr><td>7</td><td>The ask</td><td>What you need from this reader</td><td>1 sentence</td></tr></tbody></table>
+<h2 id="how-to-write-one">How to write one</h2>
+<ol><li><p><strong>Dump.</strong> Write down every idea, unfiltered. A voice note or meeting transcript works.</p></li><li><p><strong>Sort.</strong> Put each idea into one slot. Anything that fits nowhere goes on a Later list: kept, just not in this story.</p></li><li><p><strong>Write.</strong> Fill slots 2 to 7, then write the headline last and put it first.</p></li><li><p><strong>Cut.</strong> Remove any sentence the reader wouldn&#39;t miss. A first draft usually loses a third.</p></li><li><p><strong>Test.</strong> Read it aloud. Over 60 seconds, trim Why now and The picture first.</p></li></ol>
+<h2 id="rules-that-keep-it-focused">Rules that keep it focused</h2>
+<ul><li><p>One vision per page. Two headlines means two pages.</p></li><li><p>Never more than three moves.</p></li><li><p>Always say what you won&#39;t do; it is what makes the page read as intentional.</p></li><li><p>Concrete beats abstract: a person, a day, a number.</p></li><li><p>The headline and the ask are never cut.</p></li></ul>
+<h2 id="blank-page-to-copy">Blank page to copy</h2>
+<pre><code class="language-markdown"># [Vision name]
+
+**Headline.** [What changes, for whom, by when. One sentence.]
+
+**Why now.** [What shifted. What staying put costs. Two or three sentences.]
+
+**The picture.** [One scene from the future where this worked: who, doing what, what&#39;s different.]
+
+**The bet.** [The one choice this rests on.] *Not doing:* [what you&#39;re deliberately leaving out.]
+
+**Three moves.**
+1. [When: first move]
+2. [When: second move]
+3. [When: third move]
+
+**How we&#39;ll know.** [One to three signs you can see or count.]
+
+**The ask.** [What you need from this reader.]
+
+---
+
+**Later:** [ideas that didn&#39;t fit this page]</code></pre>
+<h2 id="worked-example">Worked example</h2>
+<p>An invented example, loosely based on Graphyte: the plans, dates and figures below are made up for illustration. The dump had twelve ideas; five went to Later.</p>
+<p><strong>Headline.</strong> By the end of 2027, every Graphyte project ships at a fixed price, in weeks rather than months, built by AI agent teams with me as the only human in the loop.</p>
+<p><strong>Why now.</strong> Clients no longer trust hourly billing and won&#39;t wait three months for a build. Over the past year, agent teams went from experiment to doing most of our build work. Studios that keep selling hours will lose on price and speed.</p>
+<p><strong>The picture.</strong> A founder signs a quote on Monday. By Wednesday her board is set up and engineers are building. Every Friday she sees what moved; six weeks later she launches, at the price she signed.</p>
+<p><strong>The bet.</strong> The real limit is my attention, not engineering capacity, so every process protects it. <em>Not doing:</em> growing a human team, building our own software product, or taking hourly work.</p>
+<p><strong>Three moves.</strong></p>
+<ol><li><p>Q4: one operating system across every project: one set of rules, one board standard, one escalation path.</p></li><li><p>Q1: three fixed-price offers with set scope: a site rebuild, an app&#39;s first version, a growth sprint.</p></li><li><p>Q2: double the number of clients with no new hires.</p></li></ol>
+<p><strong>How we&#39;ll know.</strong> Every project lands at its quoted price. The typical project launches in under 8 weeks. My hours per project keep falling.</p>
+<p><strong>The ask</strong> (for an advisor). Pressure-test the three offers before Q1, and introduce me to two founders who would buy the first one.</p>
+<p><strong>Busy-reader version:</strong> Every Graphyte project will ship at a fixed price in weeks, built by AI agent teams. The bet: my attention is the limit, so no new hires, no SaaS, no hourly work. I need your eyes on three offers and two founder intros.</p>
+<p><strong>Later:</strong> a SaaS, a course for other agencies, a rebrand, a podcast, narrowing to Webflow and FlutterFlow.</p>
+</main>
+</body>
+</html>
